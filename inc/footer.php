@@ -1,17 +1,12 @@
 	</div>
 
 	<div class="footer">
-
 		<div class="container">
-
-			<ul>		
-				<li>Created by UP663652 at the University of Portsmouth</li>
+			<p>&copy;<?php echo date('Y'); STORE_NAME?>  - UP663653 - University of Portsmouth</p>
+			<ul>
+				<li>Admin</li>
 			</ul>
-
-			<p>&copy;<?php echo date('Y'); STORE_NAME?></p>
-
-		</div>
-	
+		</div>	
 	</div>
 
 </body>

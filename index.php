@@ -6,6 +6,8 @@ $pageTitle = "Home";
 $section = "home";
 include(ROOT_PATH . 'inc/header.php'); ?>
 
-<p>Content Here!</p>
+<div class="container">
+	<p>Content Here!</p>
+</div>
 
 <?php include(ROOT_PATH . 'inc/footer.php') ?>
