@@ -107,8 +107,16 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 	            <p>Tell me more...</p>
 	        </a>
 	    	</li>
+	    	<?php
+	    		include(ROOT_PATH . "inc/db/database.php");
+	    			if (!($db->select_db(DB_NAME))) {
+	    				include(ROOT_PATH . "inc/db/install-db.php");
+	    				echo createDatabase();
+	    				$db->select_db(DB_NAME);
+	    			} else echo "all good";
+	    	?>
     </ul>
 	</div>
 </div>
 
-<?php include(ROOT_PATH . 'inc/footer.php') ?>
+<?php include(ROOT_PATH . 'inc/footer.php'); ?>
