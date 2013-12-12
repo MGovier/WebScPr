@@ -109,11 +109,6 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 	    	</li>
 	    	<?php
 	    		include(ROOT_PATH . "inc/db/database.php");
-	    			if (!($db->select_db(DB_NAME))) {
-	    				include(ROOT_PATH . "inc/db/install-db.php");
-	    				echo createDatabase();
-	    				$db->select_db(DB_NAME);
-	    			} else echo "all good";
 	    	?>
     </ul>
 	</div>
