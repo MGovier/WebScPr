@@ -23,92 +23,20 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 			<a href="./?pg=4">4</a>								
 		</div>
 		<ul class="products">
-			<li>
-	        <a href="#">
-	        	<h4>Product Name</h4>
-	            <img src="<?php echo BASE_URL; ?>img/favicon.png" alt="Product Image">
-	            <p>Tell me more...</p>
-	        </a>
-	    	</li>
-	    	<li>
-	        <a href="#">
-	        	<h4>Product Name</h4>
-	            <img src="<?php echo BASE_URL; ?>img/favicon.png" alt="Product Image">
-	            <p>Tell me more...</p>
-	        </a>
-	    	</li>
-	    	<li>
-	        <a href="#">
-	        	<h4>Product Name</h4>
-	            <img src="<?php echo BASE_URL; ?>img/favicon.png" alt="Product Image">
-	            <p>Tell me more...</p>
-	        </a>
-	    	</li>
-	    	<li>
-	        <a href="#">
-	        	<h4>Product Name</h4>
-	            <img src="<?php echo BASE_URL; ?>img/favicon.png" alt="Product Image">
-	            <p>Tell me more...</p>
-	        </a>
-	    	</li>
-	    	<li>
-	        <a href="#">
-	        	<h4>Product Name</h4>
-	            <img src="<?php echo BASE_URL; ?>img/favicon.png" alt="Product Image">
-	            <p>Tell me more...</p>
-	        </a>
-	    	</li>
-	    	<li>
-	        <a href="#">
-	        	<h4>Product Name</h4>
-	            <img src="<?php echo BASE_URL; ?>img/favicon.png" alt="Product Image">
-	            <p>Tell me more...</p>
-	        </a>
-	    	</li>
-	    	<li>
-	        <a href="#">
-	        	<h4>Product Name</h4>
-	            <img src="<?php echo BASE_URL; ?>img/favicon.png" alt="Product Image">
-	            <p>Tell me more...</p>
-	        </a>
-	    	</li>
-	    	<li>
-	        <a href="#">
-	        	<h4>Product Name</h4>
-	            <img src="<?php echo BASE_URL; ?>img/favicon.png" alt="Product Image">
-	            <p>Tell me more...</p>
-	        </a>
-	    	</li>
-	    	<li>
-	        <a href="#">
-	        	<h4>Product Name</h4>
-	            <img src="<?php echo BASE_URL; ?>img/favicon.png" alt="Product Image">
-	            <p>Tell me more...</p>
-	        </a>
-	    	</li>
-	    	<li>
-	        <a href="#">
-	        	<h4>Product Name</h4>
-	            <img src="<?php echo BASE_URL; ?>img/favicon.png" alt="Product Image">
-	            <p>Tell me more...</p>
-	        </a>
-	    	</li>
-	    	<li>
-	        <a href="#">
-	        	<h4>Product Name</h4>
-	            <img src="<?php echo BASE_URL; ?>img/favicon.png" alt="Product Image">
-	            <p>Tell me more...</p>
-	        </a>
-	    	</li>
-	    	<li>
-	        <a href="#">
-	        	<h4>Product Name</h4>
-	            <img src="<?php echo BASE_URL; ?>img/favicon.png" alt="Product Image">
-	            <p>Tell me more...</p>
-	        </a>
-	    	</li>
 	    	<?php
 	    		include(ROOT_PATH . "inc/db/database.php");
+	    		include(ROOT_PATH . "inc/db/insert-demo-products.php");
+	    		insert_demo_data($db);
+
+	    		$products = $db->query("SELECT * FROM PRODUCTS");
+	    		while ($row = $products->fetch_assoc()) {
+	    			echo '<li>';
+	    			echo '<a href ="#">';
+	    			echo '<h4>' . $row["PRODUCT_NAME"] . '</h4>';
+	    			echo '<img src="' . BASE_URL . $row["PRODUCT_IMAGE"] . '" alt="Product Image">';
+	    			echo '<p>' . $row["PRODUCT_DESCRIPTION"] . '</p>';
+	    			echo '</li>';
+	    		}
 	    	?>
     </ul>
 	</div>

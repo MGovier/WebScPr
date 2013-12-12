@@ -1,0 +1,4 @@
+INSERT INTO `CATEGORIES` (`CATEGORY_ID`, `CATEGORY_NAME`) VALUES 
+(1, "Food and Drink"),
+(2, "Gadgets"),
+(3, "Miscellaneous")
