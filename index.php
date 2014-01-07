@@ -9,9 +9,16 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 <div class="container">
 	<div class="categories">
 		<ul>
-			<li>Category 1</li>
-			<li>Category 2 is a long category</li>
-			<li>Cat 3</li>
+			<?php 
+				include(ROOT_PATH . "inc/db/database.php");
+	    		include(ROOT_PATH . "inc/db/insert-demo-products.php");
+	    		insert_demo_data($db);
+
+	    		$categories = $db->query("SELECT * FROM CATEGORIES");
+	    		while ($row = $categories->fetch_assoc()) {
+	    			echo '<li>' . $row["CATEGORY_NAME"] . '</li>';
+	    		}
+    		?>
 		</ul>
 	</div>
 	<div class="wrapper">
@@ -24,17 +31,14 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 		</div>
 		<ul class="products">
 	    	<?php
-	    		include(ROOT_PATH . "inc/db/database.php");
-	    		include(ROOT_PATH . "inc/db/insert-demo-products.php");
-	    		insert_demo_data($db);
 
 	    		$products = $db->query("SELECT * FROM PRODUCTS");
 	    		while ($row = $products->fetch_assoc()) {
 	    			echo '<li>';
 	    			echo '<a href ="#">';
-	    			echo '<h4>' . $row["PRODUCT_NAME"] . '</h4>';
+	    			echo '<h4 class="productName">' . $row["PRODUCT_NAME"] . '</h4>';
 	    			echo '<img src="' . BASE_URL . $row["PRODUCT_IMAGE"] . '" alt="Product Image">';
-	    			echo '<p>' . $row["PRODUCT_DESCRIPTION"] . '</p>';
+	    			echo '<p class="description">' . $row["PRODUCT_DESCRIPTION"] . '</p>';
 	    			echo '</li>';
 	    		}
 	    	?>
