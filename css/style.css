@@ -166,19 +166,19 @@ body { background:#f0eeed; color: #676767;}
 	background: #f0eeed;
 }
 
-.products {
+#products {
 	display: block;
 }
 
-.products a {
+#products a {
 	text-decoration: none;
 }
 
-.products .productName {
+#products .productName {
 	text-decoration: underline;
 }
 
-.products li {
+#products li {
     display: inline-block;
     list-style: none;
     border: 0.1em solid #e3e1e0;
@@ -192,16 +192,16 @@ body { background:#f0eeed; color: #676767;}
     overflow: auto;
 }
 
-.products li img {
+#products li img {
     width: 10em;
 }
 
-.products .description {
+#products .description {
 	color: grey;
 	font-size: 90%;
 }
 
-.products p {
+#products p {
 	text-overflow: ellipsis;
 }
 
@@ -210,7 +210,7 @@ body { background:#f0eeed; color: #676767;}
 		width: 80%;
 	}
 
-	.products li {
+	#products li {
 		width: 14em;
 	}
 
