@@ -14,6 +14,7 @@
 	<!--[if lt IE 9]>
       	<script src="<?php echo BASE_URL; ?>js/html5shiv.js"></script>
     <![endif]-->
+    <script src="<?php echo BASE_URL; ?>js/OnShopScripts.js"></script>
 
 </head>
 <body>
