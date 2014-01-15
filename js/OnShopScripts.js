@@ -29,7 +29,8 @@
 		 					+ product["PRODUCT_NAME"] + '</h4>'
 		 					+ '<img src="' + product["PRODUCT_IMAGE"]
 		 					+ '" alt="' + product["PRODUCT_NAME"] + '"><p class="description">'
-		 					+ product["PRODUCT_DESCRIPTION"].substring(0,110) + '...</p></li>';
+		 					+ product["PRODUCT_DESCRIPTION"].substring(0,110) + '...</p>'
+		 					+ '<p class="cost">&pound;' + product["PRODUCT_PRICE"].toString() + '</p></li>';
 		 	}
 		return formattedProducts;
 	};
