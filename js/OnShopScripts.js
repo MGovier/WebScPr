@@ -23,7 +23,7 @@ styleProducts = function (productsArray) {
 	var formattedProducts = "";
 	for (var i = productsArray.length - 1; i >= 0; i--) {
 	 	var product = productsArray[i];
-	 	formattedProducts += '<li><a href="' + product["PRODUCT_URL"] + '"' + 'onclick="return getProduct(' + product["PRODUCT_ID"] + ');"' 
+	 	formattedProducts += '<li><a href="' + product["PRODUCT_URL"] + '"' + 'onclick="return showProduct(' + product["PRODUCT_ID"] + ');"' 
 	 					+ '><h4 class="productName">' 
 	 					+ product["PRODUCT_NAME"] + '</h4>'
 	 					+ '<img src="' + product["PRODUCT_IMAGE"]
@@ -34,8 +34,28 @@ styleProducts = function (productsArray) {
 	return formattedProducts;
 };
 
-getProduct = function(productID) {
-	return false;
+styleProduct = function (product) {
+	var formattedProduct = "<h3>" + product["PRODUCT_NAME"] + "</h3>";
+	return formattedProduct;
 };
 
-window.addEventListener("load", pageLoaded);
+showProduct = function(productID) {
+	var xhr = new XMLHttpRequest();
+	var target = document.getElementById("products");
+	changeListener = function () {
+		if (xhr.readyState === 4 && xhr.status === 200) {
+			var product = eval( "(" + xhr.responseText + ")");
+			target.innerHTML = styleProduct(product);
+			var featuretitle = document.getElementById("feature-title");
+			featuretitle.innerHTML = product["PRODUCT_NAME"];
+			var options = document.getElementById("sideoptions");
+			options.innerHTML = ('<li><a href="#" onclick="getAllProducts();">Back</a></li>');
+		} else {
+			// waiting
+		}
+	}
+	xhr.open("GET", "API/GET/product.php?id=" + productID, true);
+	xhr.onreadystatechange = changeListener;
+	xhr.send();
+	return false;
+};

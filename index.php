@@ -7,7 +7,7 @@ $section = "home";
 include(ROOT_PATH . 'inc/header.php'); ?>
 
 <div class="container">
-	<div class="categories">
+	<div id="sideoptions">
 		<ul>
 			<?php 
 				include(ROOT_PATH . "inc/db/database.php");
@@ -22,7 +22,7 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 		</ul>
 	</div>
 	<div class="wrapper">
-		<h3 class="feature-title">New Products</h3>
+		<h3 id="feature-title">New Products</h3>
 		<div class="pagination">
 			<span>1</span>
 			<a href="./?pg=2">2</a>
@@ -30,6 +30,9 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 			<a href="./?pg=4">4</a>								
 		</div>
 		<ul id="products">
+		<script type="text/javascript">
+			window.addEventListener("load", pageLoaded);
+		</script>
     </ul>
 	</div>
 </div>
