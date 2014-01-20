@@ -13,24 +13,20 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 				include(ROOT_PATH . "inc/db/database.php");
 	    		include(ROOT_PATH . "inc/db/insert-demo-products.php");
 	    		insert_demo_data($db);
-
-	    		$categories = $db->query("SELECT * FROM CATEGORIES");
-	    		while ($row = $categories->fetch_assoc()) {
-	    			echo '<li>' . $row["CATEGORY_NAME"] . '</li>';
-	    		}
     		?>
 		</ul>
 	</div>
 	<div class="wrapper">
 		<h3 id="feature-title">New Products</h3>
-		<div class="pagination">
+<!-- 		<div class="pagination">
 			<span>1</span>
 			<a href="./?pg=2">2</a>
 			<a href="./?pg=3">3</a>
 			<a href="./?pg=4">4</a>								
-		</div>
-		<ul id="products">
-    </ul>
+		</div> -->
+		<div id="dynamic-content">
+		
+    	</div>
 	</div>
 </div>
 

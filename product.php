@@ -12,17 +12,12 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 
 <div class="container">
 	<div class="sideoptions">
-		<ul>
-			<li><a href="<?php echo BASE_URL; ?>">Home</a></li>
-		</ul>
 	</div>
-	<div class="wrapper">
+	<div class="dynamic-content">
 		<h3 id="feature-title">Product Loading</h3>
-		<ul id="products">
 		<script type="text/javascript">
 			OnShop.functions.showProduct(<?php echo $product_id; ?>);
 		</script>
-    	</ul>
 	</div>
 </div>
 

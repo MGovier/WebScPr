@@ -4,16 +4,16 @@ var OnShop = OnShop || {};
 OnShop.functions = (function () {
     'use strict';
     var pageLoaded = function () {
-        getAllProducts();
+        showDefaultHomepage();
     };
 
     var getAllProducts = function () {
-        var target = document.getElementById('products');
+        var target = document.getElementById('dynamic-content');
         target.innerHTML = ('<img class="loader" src="img/ajax-loader.gif" alt="Loading">');
         var xhr = new XMLHttpRequest();
         xhr.onload = function () {
-            if (xhr.status === 200) {
-                var productsArray = JSON.parse(xhr.responseText);
+            if (this.status === 200 || this.status === 301) {
+                var productsArray = JSON.parse(this.responseText);
                 target.innerHTML = styleProducts(productsArray);
             } else {
                 target.innerHTML = '<p>Something went wrong.</p>';
@@ -23,8 +23,33 @@ OnShop.functions = (function () {
         xhr.send();
     };
 
+    var showDefaultHomepage = function () {
+        var target = document.getElementById('sideoptions');
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            if (this.status === 200 || this.status === 301) {
+                var categories = JSON.parse(this.responseText);
+                target.innerHTML = styleCategories(categories);
+            }
+        };
+        xhr.open('GET', 'API/GET/categories.php', true);
+        xhr.send();
+        var title = document.getElementById('feature-title');
+        title.innerHTML = 'Latest Products';
+        getAllProducts();
+    };
+
+    var styleCategories = function (categoriesArray) {
+        var formattedCategories = '';
+        for (var i = categoriesArray.length - 1; i >= 0; i--) {
+            var category = categoriesArray[i];
+            formattedCategories += '<li>' + category.CATEGORY_NAME + '</li>';
+        }
+        return formattedCategories;
+    };
+
     var styleProducts = function (productsArray) {
-        var formattedProducts = '';
+        var formattedProducts = '<ul id="products">';
         for (var i = productsArray.length - 1; i >= 0; i--) {
             var product = productsArray[i];
             formattedProducts += '<li><a href="' + product.PRODUCT_URL + '"' +
@@ -36,11 +61,17 @@ OnShop.functions = (function () {
                             product.PRODUCT_DESCRIPTION.substring(0,110) + '...</p>' +
                             '<p class="cost">&pound;' + product.PRODUCT_PRICE.toString() + '</a></p></li>';
             }
-        return formattedProducts;
+        return formattedProducts + '</ul>';
     };
 
     var styleProduct = function (product) {
-        var formattedProduct = '<h3>' + product.PRODUCT_NAME + '</h3>';
+        var formattedProduct = '<div id="product">' +
+                               '<img src="' + product.PRODUCT_IMAGE + '" alt="' + product.PRODUCT_NAME + '">' +
+                               '<div id="product-details">' +
+                               '<p id="description">' + product.PRODUCT_DESCRIPTION + '</p>' +
+                               '<p id="stock">Stock: ' + product.PRODUCT_STOCK + '</p>' +
+                               '<p id="price">Price: ' + product.PRODUCT_PRICE + '</p>' +
+                               '<button id="addToBasket">Add to Basket!</button></div>';
         return formattedProduct;
     };
 
@@ -61,17 +92,17 @@ OnShop.functions = (function () {
 
     var showProduct = function(productID) {
         var xhr = new XMLHttpRequest();
-        var target = document.getElementById('products');
+        var target = document.getElementById('dynamic-content');
         xhr.onload = function () {
-            if (this.status === 200) {
+            if (this.status === 200 || this.status === 30) {
                 var product = JSON.parse(xhr.responseText);
                 target.innerHTML = styleProduct(product);
                 var featuretitle = document.getElementById('feature-title');
                 featuretitle.innerHTML = product.PRODUCT_NAME;
                 var options = document.getElementById('sideoptions');
-                options.innerHTML = ('<li><a href="#" onclick="OnShop.functions.getAllProducts();">Back</a></li>');
+                options.innerHTML = ('<li><a href="#" onclick="OnShop.functions.showDefaultHomepage();">Back</a></li>');
             } else {
-                // waiting
+                target.innerHTML = this.status;
             }
         };
         xhr.open('GET', 'API/GET/product.php?id=' + productID, true);
@@ -86,7 +117,7 @@ OnShop.functions = (function () {
     return {
         pageLoaded: pageLoaded,
         showProduct: showProduct,
-        getAllProducts: getAllProducts
+        showDefaultHomepage: showDefaultHomepage
     };
 }());
 
