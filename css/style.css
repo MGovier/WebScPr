@@ -1,7 +1,8 @@
 @import url("normalize.css");
+@import url(http://fonts.googleapis.com/css?family=Lato);
 
 html {overflow-y: scroll; overflow-x: hidden;}
-body { background:#f0eeed; color: #676767;}
+body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 
 .container {
 	width: 98%;
@@ -131,6 +132,10 @@ body { background:#f0eeed; color: #676767;}
 	background: #f0eeed;
 }
 
+#sideoptions a {
+	text-decoration: none;
+}
+
 .wrapper {
 	float: left;
 	display: inline-block;
@@ -244,18 +249,18 @@ body { background:#f0eeed; color: #676767;}
 	}
 }
 @media (max-width: 500px) {
-	.categories {
+	#sideoptions {
 		width: 100%;
 		max-width: 100%;
 		display: block;
 	}
-	.categories ul {
+	#sideoptions ul {
 		width: 90%;
 		margin: 0 auto;
 		padding: 0;
 	}
 
-	.categories ul li {
+	#sideoptions ul li {
 		padding: 0.4em;
 		margin: 0.4em auto;
 	}

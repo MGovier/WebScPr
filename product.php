@@ -20,7 +20,7 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 		<h3 id="feature-title">Product Loading</h3>
 		<ul id="products">
 		<script type="text/javascript">
-			showProduct(<?php echo $product_id; ?>);
+			OnShop.functions.showProduct(<?php echo $product_id; ?>);
 		</script>
     	</ul>
 	</div>

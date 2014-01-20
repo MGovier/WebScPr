@@ -30,9 +30,6 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 			<a href="./?pg=4">4</a>								
 		</div>
 		<ul id="products">
-		<script type="text/javascript">
-			window.addEventListener("load", pageLoaded);
-		</script>
     </ul>
 	</div>
 </div>
