@@ -9,12 +9,13 @@ OnShop.functions = (function () {
 
     var getAllProducts = function () {
         var target = document.getElementById('dynamic-content');
-        target.innerHTML = ('<img class="loader" src="img/ajax-loader.gif" alt="Loading">');
+        target.classList.add('loading');
         var xhr = new XMLHttpRequest();
         xhr.onload = function () {
             if (this.status === 200 || this.status === 301) {
                 var productsArray = JSON.parse(this.responseText);
                 target.innerHTML = styleProducts(productsArray);
+                target.classList.remove('loading');
             } else {
                 target.innerHTML = '<p>Something went wrong.</p>';
             }
@@ -59,7 +60,7 @@ OnShop.functions = (function () {
                             '<img src="' + product.PRODUCT_IMAGE + '" alt="' +
                             product.PRODUCT_NAME + '"><p class="description">' +
                             product.PRODUCT_DESCRIPTION.substring(0,110) + '...</p>' +
-                            '<p class="cost">&pound;' + product.PRODUCT_PRICE.toString() + '</a></p></li>';
+                            '<p class="cost">&pound;' + Number(product.PRODUCT_PRICE).toFixed(2).toLocaleString() + '</a></p></li>';
             }
         return formattedProducts + '</ul>';
     };
@@ -100,13 +101,18 @@ OnShop.functions = (function () {
                 var featuretitle = document.getElementById('feature-title');
                 featuretitle.innerHTML = product.PRODUCT_NAME;
                 var options = document.getElementById('sideoptions');
+                document.title = product.PRODUCT_NAME;
+                var stateObj = {'html': 'product.php?id=' + product.PRODUCT_ID};
+                window.history.pushState(stateObj, product.PRODUCT_NAME, 'product.php?id=' + product.PRODUCT_ID);
+                // window.onpopstate = showDefaultHomepage();
                 options.innerHTML = ('<li><a href="#" onclick="OnShop.functions.showDefaultHomepage();">Back</a></li>');
-            } else {
+                } else {
                 target.innerHTML = this.status;
             }
         };
         xhr.open('GET', 'API/GET/product.php?id=' + productID, true);
         xhr.send();
+
         // var xhrresult = xhrGetter('API/GET/product.php?id=' + productID);
         // console.log(xhrresult);
         // var result = JSON.parse(xhrresult);
@@ -120,5 +126,3 @@ OnShop.functions = (function () {
         showDefaultHomepage: showDefaultHomepage
     };
 }());
-
-window.addEventListener('load', OnShop.functions.pageLoaded);

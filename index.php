@@ -16,7 +16,6 @@ include(ROOT_PATH . 'inc/header.php'); ?>
     		?>
 		</ul>
 	</div>
-	<div class="wrapper">
 		<h3 id="feature-title">New Products</h3>
 <!-- 		<div class="pagination">
 			<span>1</span>
@@ -25,9 +24,10 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 			<a href="./?pg=4">4</a>								
 		</div> -->
 		<div id="dynamic-content">
-		
+		<script type="text/javascript">
+		window.addEventListener('load', OnShop.functions.pageLoaded);
+		</script>
     	</div>
-	</div>
 </div>
 
 <?php include(ROOT_PATH . 'inc/footer.php'); ?>

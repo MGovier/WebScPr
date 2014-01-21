@@ -11,10 +11,10 @@ $section = "product";
 include(ROOT_PATH . 'inc/header.php'); ?>
 
 <div class="container">
-	<div class="sideoptions">
+	<div id="sideoptions">
 	</div>
-	<div class="dynamic-content">
-		<h3 id="feature-title">Product Loading</h3>
+	<h3 id="feature-title">Product Loading</h3>
+	<div id="dynamic-content">
 		<script type="text/javascript">
 			OnShop.functions.showProduct(<?php echo $product_id; ?>);
 		</script>

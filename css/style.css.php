@@ -1,3 +1,9 @@
+<?php 
+	header("Content-type: text/css"); 
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/663652/OnShop/inc/config.php");
+?>
+
+
 @import url("normalize.css");
 @import url(http://fonts.googleapis.com/css?family=Lato);
 
@@ -261,46 +267,11 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 }
 
 .loading {
-	background-image:url('../img/assets/ajax-loader.gif');
-	background-repeat:no-repeat;
-	height: 4em;
-}
-
-#productsTable #thumbnail img {
-	max-width: 4em;
-}
-
-#productsTable {
 	margin: 0 auto;
-}
-
-#productsTable td, th {
-	border: 0.1em solid #e3e1e0;
-	padding: 0.5em;
-}
-
-.hidden {
-	display: none;
-}
-
-#addProductForm {
-	margin: 0 auto;
-	width: 60%;
-}
-
-#addProductForm input {
 	display: block;
-	max-width: 60%;
-
+	background-image:url('<?php echo BASE_URL; ?>img/assets/ajax-loader.gif');
+	width: 4em;
 }
-
-#addProductForm label {
-	float: left;
-	display: block;
-	padding-right: 0.5em;
-	text-align: right;
-}
-
 
 @media (min-width: 1200px) {
 	.container {

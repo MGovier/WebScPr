@@ -3,7 +3,13 @@
 	include(ROOT_PATH . "inc/db/database.php");
 	include(ROOT_PATH . "inc/db/insert-demo-products.php");
 	insert_demo_data($db);
-	$products = $db->query("SELECT * FROM PRODUCTS");
+	if (isset($_GET["sort"])) {
+		if (strtolower($_GET["sort"]) === "stockasc") {
+			$products = $db->query("SELECT * FROM PRODUCTS ORDER BY PRODUCT_STOCK ASC");	
+		}
+	} else {
+		$products = $db->query("SELECT * FROM PRODUCTS");
+	}
 	$productsArray = array();
 	while ($row = $products->fetch_assoc()) {
 		$row["PRODUCT_IMAGE"] = BASE_URL . $row["PRODUCT_IMAGE"];

@@ -5,11 +5,11 @@
 	<title><?php echo STORE_NAME . " > " . $pageTitle; ?></title>
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>css/style.css" type="text/css">
 	<!-- Icons -->
-	<link rel="apple-touch-icon" href="<?php echo BASE_URL; ?>img/apple-icon-touch.png">
-	<link rel="icon" href="<?php echo BASE_URL; ?>img/favicon.png">
+	<link rel="apple-touch-icon" href="<?php echo BASE_URL; ?>img/assets/apple-icon-touch.png">
+	<link rel="icon" href="<?php echo BASE_URL; ?>img/assets/favicon.png">
 	<!-- Icon and HTML5 support for older IE -->
 	<!--[if IE]>
-  		<link rel="shortcut icon" href="<?php echo BASE_URL; ?>img/favicon.ico">
+  		<link rel="shortcut icon" href="<?php echo BASE_URL; ?>img/assets/favicon.ico">
 	<![endif]-->
 	<!--[if lt IE 9]>
       	<script src="<?php echo BASE_URL; ?>js/html5shiv.js"></script>
@@ -26,7 +26,7 @@
 				<li><a href="#">About</a></li>
 			</ul>
 			<form method="post" action="search.php" class="searchbar">
-				<input type="text" name="search" value="" id="search" placeholder="Search Products">
+				<input type="search" name="search" id="search" placeholder="Search Products">
 			</form>		
 	</div>
 </div>
