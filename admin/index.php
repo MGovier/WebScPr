@@ -18,15 +18,15 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 
 		<div id="dynamic-content">
     	</div>
-    		<form id="addProductForm" class="hidden">
+    		<form id="addProductForm" name="addProductForm" class="hidden" action="<?php echo BASE_URL; ?>API/POST/product.php" >
     			<fieldset>
     				<p>
 		    			<label for="productName">Product Name:</label>
-		    			<input type="text" id="productName" placeholder="Enter product name">
+		    			<input type="text" id="productName" name="productName" placeholder="Enter product name">
 	    			</p>
 	    			<p>
 		    			<label for="productCategory">Product Category:</label>
-		    			<select id="productCategory">
+		    			<select id="productCategory" name="productCategory">
 		    				<?php
 								// IMPROVE THIS
 								include(ROOT_PATH . "inc/db/database.php");
@@ -39,16 +39,24 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 	    			</p>
 	    			<p>
 		    			<label for="productImage">Product Image:</label>
-		    			<input type="file" id="productImage">
+		    			<input type="file" id="productImage" name="productImage">
 	    			</p>
 	    			<p>
 		    			<label for="productDescription">Product Description:</label>
-		    			<textarea id="productDescription" placeholder="Enter product description"></textarea>
+		    			<textarea id="productDescription" name="productDescription" placeholder="Enter product description"></textarea>
 	    			</p>
 	    			<p>
 		    			<label for="productStock">Enter initial stock:</label>
-		    			<input type="number" min="0" id="productStock" placeholder="Enter product stock number">
+		    			<input type="number" min="0" id="productStock" name="productStock" placeholder="Enter product stock">
 	    			</p>
+	    			<p>
+		    			<label for="productPrice">Enter price:</label>
+		    			<input type="number" min="0" id="productPrice" name="productPrice" placeholder="Enter product price">
+	    			</p>
+	    			<p>
+	    				<label for="submit">Submit item:</label>
+	    				<input type="submit" id="submit" name="submit" value="Submit!" onclick="return OnShopAdmin.functions.sendForm(this.form);">
+    				</p>
     			</fieldset>
 			</form>
 </div>

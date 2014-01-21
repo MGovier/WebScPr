@@ -20,7 +20,7 @@ OnShopAdmin.functions = (function () {
     };
 
     var styleProductsAdmin = function(productsArray) {
-        var returnString = '<table id=productsTable><caption>Products Sorted By Stock</caption><thead><tr><th>Product ID</th><th>Product Thumbnail</th><th>Product Name</th><th>Product Price</th><th>Product Stock</th><th>Product Sales (NYI)</th><th>Edit?</th></tr></thead>';
+        var returnString = '<table id=productsTable><caption>Products Sorted By Stock</caption><thead><tr><th>Product ID</th><th>Product Thumbnail</th><th>Product Name</th><th>Product Price</th><th>Product Stock</th><th>Product Sales (NYI)</th><th>Update</th></tr></thead>';
         for (var i = 0; i < productsArray.length; i++) {
             var product = productsArray[i];
             returnString += '<tr><td>' + product.PRODUCT_ID + '</td>' +
@@ -50,9 +50,27 @@ OnShopAdmin.functions = (function () {
         addFormToggle.addEventListener('click', toggleAddForm);
     };
 
+    var sendForm = function (form) {
+        var formData = new FormData(form);
+        var xhr = new XMLHttpRequest();
+        var feedbackTarget = document.getElementById('dynamic-content');
+        xhr.open('POST', form.action, true);
+        xhr.onload = function () {
+            if (this.status === 200 || this.status === 301) {
+                feedbackTarget.innerHTML = this.responseText;
+            } else {
+                feedbackTarget.innerHTML = '<p>Something went wrong.</p>';
+            }
+        };
+        xhr.send(formData);
+        return false; // Stop page from submitting.
+    };
+
     return {
         getAllProductsAdmin: getAllProductsAdmin,
-        loaded: loaded
+        loaded: loaded,
+        sendForm: sendForm
     };
+
 }());
 window.addEventListener('load', OnShopAdmin.functions.loaded);
