@@ -7,37 +7,62 @@ OnShop.functions = (function () {
         showDefaultHomepage();
     };
 
-    var getAllProducts = function () {
-        var target = document.getElementById('dynamic-content');
-        target.classList.add('loading');
-        var xhr = new XMLHttpRequest();
+    var xhrClient = function (source, callback) {
+    var xhr = new XMLHttpRequest();
         xhr.onload = function () {
-            if (this.status === 200 || this.status === 301) {
-                var productsArray = JSON.parse(this.responseText);
-                target.innerHTML = styleProducts(productsArray);
-                target.classList.remove('loading');
+            if (this.status == 200 || this.status == 304) {
+                callback(this.response);
             } else {
-                target.innerHTML = '<p>Something went wrong.</p>';
+                callback('Error with XHR');
             }
         };
-        xhr.open('GET', 'API/GET/products.php', true);
-        xhr.send();
+    xhr.open('GET', source, true);
+    xhr.onerror = function () {return 'XHR Error'; };
+    xhr.send();
     };
 
+
     var showDefaultHomepage = function () {
-        var target = document.getElementById('sideoptions');
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function () {
-            if (this.status === 200 || this.status === 301) {
-                var categories = JSON.parse(this.responseText);
-                target.innerHTML = styleCategories(categories);
-            }
+        var catTarget = document.getElementById('sideoptions');
+        var catCallback = function (responseText) {
+            var categories = JSON.parse(responseText);
+            catTarget.innerHTML = styleCategories(categories);
         };
-        xhr.open('GET', 'API/GET/categories.php', true);
-        xhr.send();
+        xhrClient('API/GET/categories.php', catCallback);
         var title = document.getElementById('feature-title');
         title.innerHTML = 'Latest Products';
-        getAllProducts();
+        var target = document.getElementById('dynamic-content');
+        target.classList.add('loading');
+        var callback = function (responseText) {
+            var productsArray = JSON.parse(responseText);
+            showProducts(productsArray);
+            target.classList.remove('loading');
+            var searchBox = document.getElementById('search');
+            searchBox.addEventListener('keyup', function () {
+                var string = searchBox.value.toLowerCase();
+                var searchCallback = function (matches) {
+                    if (matches.length !== 0) {
+                        showProducts(matches);
+                    } else {
+                        target.innerHTML = '<p>No matches, sorry!</p>';
+                    }
+                };
+                searchProducts(productsArray, string, searchCallback);
+            });
+            var searchProducts = function (productsArray, search, searchCallback) {
+                var returnArray = [];
+                for (var i = productsArray.length - 1; i >= 0; i--) {
+                    var product = productsArray[i];
+                    var productDescription = product.PRODUCT_DESCRIPTION.toLowerCase();
+                    var productName = product.PRODUCT_NAME.toLowerCase();
+                    if (productDescription.indexOf(search) >= 0 || productName.indexOf(search) >= 0) {
+                        returnArray.push(product);
+                    }
+                }
+                searchCallback(returnArray);
+            };
+        };
+        xhrClient('API/GET/products.php', callback);
     };
 
     var styleCategories = function (categoriesArray) {
@@ -49,7 +74,8 @@ OnShop.functions = (function () {
         return formattedCategories;
     };
 
-    var styleProducts = function (productsArray) {
+    var showProducts = function (productsArray) {
+        var target = document.getElementById('dynamic-content');
         var formattedProducts = '<ul id="products">';
         for (var i = productsArray.length - 1; i >= 0; i--) {
             var product = productsArray[i];
@@ -62,7 +88,7 @@ OnShop.functions = (function () {
                             product.PRODUCT_DESCRIPTION.substring(0,110) + '...</p>' +
                             '<p class="cost">&pound;' + Number(product.PRODUCT_PRICE).toFixed(2).toLocaleString() + '</a></p></li>';
             }
-        return formattedProducts + '</ul>';
+        target.innerHTML = formattedProducts;
     };
 
     var styleProduct = function (product) {
@@ -76,47 +102,21 @@ OnShop.functions = (function () {
         return formattedProduct;
     };
 
-    // WHY NO WORK?
-    // var xhrGetter = function (source) {
-    //     var xhr = new XMLHttpRequest();
-    //     xhr.open('GET', source, true);
-    //     xhr.onload = function () {
-    //         if (this.status == 200 || this.status == 301) {
-    //             return this.response;
-    //         } else {
-    //             return this.status;
-    //         }
-    //     };
-    //     xhr.onerror = function () {return 'XHR Error'; };
-    //     xhr.send();
-    // };
-
     var showProduct = function(productID) {
-        var xhr = new XMLHttpRequest();
         var target = document.getElementById('dynamic-content');
-        xhr.onload = function () {
-            if (this.status === 200 || this.status === 30) {
-                var product = JSON.parse(xhr.responseText);
-                target.innerHTML = styleProduct(product);
-                var featuretitle = document.getElementById('feature-title');
-                featuretitle.innerHTML = product.PRODUCT_NAME;
-                var options = document.getElementById('sideoptions');
-                document.title = product.PRODUCT_NAME;
-                var stateObj = {'html': 'product.php?id=' + product.PRODUCT_ID};
-                window.history.pushState(stateObj, product.PRODUCT_NAME, 'product.php?id=' + product.PRODUCT_ID);
-                // window.onpopstate = showDefaultHomepage();
-                options.innerHTML = ('<li><a href="#" onclick="OnShop.functions.showDefaultHomepage();">Back</a></li>');
-                } else {
-                target.innerHTML = this.status;
-            }
+        var callback = function (responseText) {
+            var product = JSON.parse(responseText);
+            target.innerHTML = styleProduct(product);
+            var featuretitle = document.getElementById('feature-title');
+            featuretitle.innerHTML = product.PRODUCT_NAME;
+            var options = document.getElementById('sideoptions');
+            document.title = product.PRODUCT_NAME;
+            var stateObj = {'html': 'product.php?id=' + product.PRODUCT_ID};
+            window.history.pushState(stateObj, product.PRODUCT_NAME, 'product.php?id=' + product.PRODUCT_ID);
+            // window.onpopstate = showDefaultHomepage();
+            options.innerHTML = ('<li><a href="#" onclick="OnShop.functions.showDefaultHomepage();">Back</a></li>');
         };
-        xhr.open('GET', 'API/GET/product.php?id=' + productID, true);
-        xhr.send();
-
-        // var xhrresult = xhrGetter('API/GET/product.php?id=' + productID);
-        // console.log(xhrresult);
-        // var result = JSON.parse(xhrresult);
-        // target.innerHTML = styleProduct(result);
+        xhrClient('API/GET/product.php?id=' + productID, callback);
         return false;
     };
 
