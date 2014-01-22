@@ -40,27 +40,21 @@ OnShop.functions = (function () {
             var searchBox = document.getElementById('search');
             searchBox.addEventListener('keyup', function () {
                 var string = searchBox.value.toLowerCase();
-                var searchCallback = function (matches) {
-                    if (matches.length !== 0) {
-                        showProducts(matches);
-                    } else {
-                        target.innerHTML = '<p>No matches, sorry!</p>';
-                    }
-                };
-                searchProducts(productsArray, string, searchCallback);
-            });
-            var searchProducts = function (productsArray, search, searchCallback) {
-                var returnArray = [];
+                var matches = [];
                 for (var i = productsArray.length - 1; i >= 0; i--) {
                     var product = productsArray[i];
                     var productDescription = product.PRODUCT_DESCRIPTION.toLowerCase();
                     var productName = product.PRODUCT_NAME.toLowerCase();
-                    if (productDescription.indexOf(search) >= 0 || productName.indexOf(search) >= 0) {
-                        returnArray.push(product);
+                    if (productDescription.indexOf(string) >= 0 || productName.indexOf(string) >= 0) {
+                        matches.push(product);
                     }
                 }
-                searchCallback(returnArray);
-            };
+                if (matches.length !== 0) {
+                    showProducts(matches);
+                } else {
+                    target.innerHTML = '<p>No matches, sorry!</p>';
+                }
+            });
         };
         xhrClient('API/GET/products.php', callback);
     };
