@@ -70,17 +70,21 @@ OnShop.functions = (function () {
 
     var filterProducts = function (productsArray, categoryID) {
             var matches = [];
-            for (var i = productsArray.length - 1; i >= 0; i--) {
-                var product = productsArray[i];
-                if (product.CATEGORY_ID == categoryID) {
-                    matches.push(product);
+            if (categoryID == -1) {
+                showProducts(productsArray);
+            } else {
+                for (var i = productsArray.length - 1; i >= 0; i--) {
+                    var product = productsArray[i];
+                    if (product.CATEGORY_ID == categoryID) {
+                        matches.push(product);
+                    }
                 }
+                showProducts(matches);
             }
-            showProducts(matches);
     };
 
     var styleCategories = function (categoriesArray) {
-        var formattedCategories = '';
+        var formattedCategories = '<li class="category" id="-1">Show All</li>';
         for (var i = categoriesArray.length - 1; i >= 0; i--) {
             var category = categoriesArray[i];
             formattedCategories += '<li class="category" id="' + category.CATEGORY_ID + '">'+ category.CATEGORY_NAME + '</li>';
