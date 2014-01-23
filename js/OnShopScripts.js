@@ -37,7 +37,18 @@ OnShop.functions = (function () {
             var productsArray = JSON.parse(responseText);
             showProducts(productsArray);
             target.classList.remove('loading');
-            var searchBox = document.getElementById('search');
+            enableLiveSearch(target, productsArray);
+            document.getElementById('sideoptions').addEventListener('click', function (e) {
+                if (parseInt(e.target.id)) {
+                    filterProducts(productsArray, e.target.id);
+                }
+                });
+        };
+        xhrClient('API/GET/products.php', callback);
+    };
+
+    var enableLiveSearch = function (target, productsArray) {
+        var searchBox = document.getElementById('search');
             searchBox.addEventListener('keyup', function () {
                 var string = searchBox.value.toLowerCase();
                 var matches = [];
@@ -55,15 +66,24 @@ OnShop.functions = (function () {
                     target.innerHTML = '<p>No matches, sorry!</p>';
                 }
             });
-        };
-        xhrClient('API/GET/products.php', callback);
+    };
+
+    var filterProducts = function (productsArray, categoryID) {
+            var matches = [];
+            for (var i = productsArray.length - 1; i >= 0; i--) {
+                var product = productsArray[i];
+                if (product.CATEGORY_ID == categoryID) {
+                    matches.push(product);
+                }
+            }
+            showProducts(matches);
     };
 
     var styleCategories = function (categoriesArray) {
         var formattedCategories = '';
         for (var i = categoriesArray.length - 1; i >= 0; i--) {
             var category = categoriesArray[i];
-            formattedCategories += '<li>' + category.CATEGORY_NAME + '</li>';
+            formattedCategories += '<li class="category" id="' + category.CATEGORY_ID + '">'+ category.CATEGORY_NAME + '</li>';
         }
         return formattedCategories;
     };
