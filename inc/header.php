@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8" />
+	<meta charset="UTF-8"/>	
 	<title><?php echo STORE_NAME . " > " . $pageTitle; ?></title>
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>css/style.css" type="text/css">
 	<!-- Icons -->

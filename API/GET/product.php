@@ -1,5 +1,5 @@
 <?php 
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/663652/OnShop/inc/config.php");
+	require_once("../../inc/config.php");
 	include(ROOT_PATH . "inc/db/database.php");
 	if (isset($_GET["id"])) {
 		$product_id = intval($_GET["id"]);
