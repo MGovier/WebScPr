@@ -39,7 +39,6 @@
         }
         if (null == ($_FILES["productImage"]["tmp_name"])) {
         	$productImage = "img/assets/favicon.png";
-        	echo "using default";
         } else {
 			$file = $_FILES['productImage'];
 			$path = $file['name'];

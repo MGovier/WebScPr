@@ -129,11 +129,26 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
     border: 0.1em solid #e3e1e0;
 	padding: 1em;
 	margin: 0.8em;
-	background: #f0eeed;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+	text-align: center;
+	background: #5287E3;
+	border-bottom: 0.1em solid #2558B0;
+	color: white;
+	box-shadow: inset 0 -0.1em #2558B0;
+	box-shadow: 0.05em 0.1em 0.2em #888;
+	cursor: pointer;
+}
+
+#sideoptions li:hover {
+	box-shadow: inset 0em -0.5em 0.5em #2558B0;
 }
 
 #sideoptions a {
 	text-decoration: none;
+	color: white;
+	display: block;
+	width: 100%;
+	height: 100%;
 }
 
 #dynamic-content {

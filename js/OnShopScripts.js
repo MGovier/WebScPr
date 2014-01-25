@@ -38,10 +38,10 @@ OnShop.functions = (function () {
             showProducts(productsArray);
             target.classList.remove('loading');
             enableLiveSearch(target, productsArray);
-            document.getElementById('sideoptions').addEventListener('click', function (e) {
-                if (parseInt(e.target.id)) {
-                    filterProducts(productsArray, e.target.id);
-                }
+            document.querySelector('#sideoptions').addEventListener('click', function (e) {
+                    if (parseInt(e.target.id))  {
+                        filterProducts(productsArray, e.target.id);
+                    }
                 });
         };
         xhrClient('API/GET/products.php', callback);
@@ -85,9 +85,10 @@ OnShop.functions = (function () {
 
     var styleCategories = function (categoriesArray) {
         var formattedCategories = '<li class="category" id="-1">Show All</li>';
-        for (var i = categoriesArray.length - 1; i >= 0; i--) {
+        for (var i = 0; i < categoriesArray.length; i++) {
             var category = categoriesArray[i];
-            formattedCategories += '<li class="category" id="' + category.CATEGORY_ID + '">'+ category.CATEGORY_NAME + '</li>';
+            formattedCategories += '<li class="category" id="' + category.CATEGORY_ID +
+                                    '">'+ category.CATEGORY_NAME + '</li>';
         }
         return formattedCategories;
     };
@@ -141,6 +142,7 @@ OnShop.functions = (function () {
     return {
         pageLoaded: pageLoaded,
         showProduct: showProduct,
+        xhrClient: xhrClient,
         showDefaultHomepage: showDefaultHomepage
     };
 }());
