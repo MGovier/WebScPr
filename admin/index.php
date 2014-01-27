@@ -10,8 +10,9 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 <div class="container">
 	<div id="sideoptions">
 		<ul>
-		<li id="stockLevels"><a href="#">View stock levels</a></li>
-		<li id="productAddFormToggle"><a href="#">Add an item</a></li>
+		<li id="stockLevels">View stock levels</li>
+		<li id="productAddFormToggle">Add an item</li>
+		<li id="addCategoryToggle">Add a category</li>
 		</ul>
 	</div>
 		<h3 id="feature-title">Admin Control</h3>

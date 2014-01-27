@@ -298,18 +298,18 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 	display: none;
 }
 
-#addProductForm {
+.adminForm {
 	margin: 0 auto;
 	width: 60%;
 }
 
-#addProductForm input {
+.adminForm input {
 	display: block;
 	max-width: 60%;
 
 }
 
-#addProductForm label {
+.adminForm label {
 	float: left;
 	display: block;
 	padding-right: 0.5em;

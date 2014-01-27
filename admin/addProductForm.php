@@ -1,7 +1,7 @@
 <?php
 require_once("../inc/config.php");
 ?>
-	<form id="addProductForm" name="addProductForm" action="<?php echo BASE_URL; ?>API/POST/product.php" >
+	<form class="adminForm" name="addProductForm" action="<?php echo BASE_URL; ?>API/POST/product.php" >
     			<fieldset>
     				<p>
 		    			<label for="productName">Product Name:</label>
