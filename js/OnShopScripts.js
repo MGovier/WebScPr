@@ -132,7 +132,7 @@ OnShop.functions = (function () {
             document.title = product.PRODUCT_NAME;
             var stateObj = {'html': 'product.php?id=' + product.PRODUCT_ID};
             window.history.pushState(stateObj, product.PRODUCT_NAME, 'product.php?id=' + product.PRODUCT_ID);
-            // window.onpopstate = showDefaultHomepage();
+            window.onpopstate = showDefaultHomepage;
             options.innerHTML = ('<li><a href="#" onclick="OnShop.functions.showDefaultHomepage();">Back</a></li>');
         };
         xhrClient('API/GET/product.php?id=' + productID, callback);
