@@ -27,6 +27,7 @@ OnShop.functions = (function () {
         var catCallback = function (responseText) {
             var categories = JSON.parse(responseText);
             catTarget.innerHTML = styleCategories(categories);
+            showBasket();
         };
         xhrClient('API/GET/categories.php', catCallback);
         var title = document.getElementById('feature-title');
@@ -45,6 +46,43 @@ OnShop.functions = (function () {
                 });
         };
         xhrClient('API/GET/products.php', callback);
+    };
+
+    var showBasket = function () {
+        var sideMenu = document.getElementById('sideoptions');
+        var basketCookie = getBasketCookie();
+        if (basketCookie === null) {
+            var newBasketCallback = function (responseText) {
+                var basketID = responseText;
+                document.cookie = 'OnShopBasket=' + basketID + ';max-age=15768000;expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/';
+            };
+            xhrClient('API/GET/basket.php', newBasketCallback);
+        } else {
+            var basketID = basketCookie.substring(13,basketCookie.length);
+            var callback = function (response) {
+                var products = JSON.parse(response);
+                var productsCount = products.length + ' Product';
+                if (products.length > 1) {productsCount += 's';}
+                var totalCost = 0.00;
+                for (var i = products.length - 1; i >= 0; i--) {
+                    var product = products[i];
+                    totalCost += product.PRODUCT_PRICE;
+                }
+                sideMenu.innerHTML += '<li id="basket"><p>' + productsCount + ' in Basket</p><p>Total cost: £' + totalCost + '</p><p>Checkout?</p></li>';
+            };
+            xhrClient('API/GET/basket.php?basket_id=' + basketID, callback);
+        }
+    };
+
+    var getBasketCookie = function() {
+        var cookies = document.cookie.split(';');
+        for (var i = cookies.length - 1; i >= 0; i--) {
+            var cookie = cookies[i].trim();
+            if (cookie.indexOf('OnShopBasket') === 0) {
+                return cookie;
+            }
+        }
+        return null;
     };
 
     var enableLiveSearch = function (target, productsArray) {
@@ -133,7 +171,27 @@ OnShop.functions = (function () {
             var stateObj = {'html': 'product.php?id=' + product.PRODUCT_ID};
             window.history.pushState(stateObj, product.PRODUCT_NAME, 'product.php?id=' + product.PRODUCT_ID);
             window.onpopstate = showDefaultHomepage;
-            options.innerHTML = ('<li><a href="#" onclick="OnShop.functions.showDefaultHomepage();">Back</a></li>');
+            options.innerHTML = '<li><a href="#" onclick="OnShop.functions.showDefaultHomepage;">Back</a></li>';
+            showBasket();
+            var addToBasketButton = document.getElementById('addToBasket');
+            addToBasketButton.addEventListener('click', function() {
+                var basketCookie = getBasketCookie();
+                var basketID = basketCookie.substring(13,basketCookie.length);
+                var formData = new FormData();
+                formData.append('basket_id', basketID);
+                formData.append('product_id', product.PRODUCT_ID);
+                formData.append('action', 'add');
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'API/POST/basket.php', true);
+                xhr.onload = function () {
+                    if (this.status === 200 || this.status === 301) {
+                        console.log(this.responseText);
+                    } else {
+                        console.log('Something went wrong');
+                    }
+                };
+                xhr.send(formData);
+            });
         };
         xhrClient('API/GET/product.php?id=' + productID, callback);
         return false;

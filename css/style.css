@@ -127,8 +127,8 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 	list-style: none;
 	margin: 0 auto;
     border: 0.1em solid #e3e1e0;
-	padding: 1em;
-	margin: 0.8em;
+	padding: 0.5em;
+	margin: 0.4em;
 	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 	text-align: center;
 	background: #5287E3;
@@ -315,6 +315,19 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 	padding-right: 0.5em;
 	text-align: right;
 }
+
+#basket {
+	display: block;
+	float: left;
+	width: 10em;
+	background-color: #2558B0 !important;
+}
+
+#basket p {
+	padding: 0;
+	margin: 0;
+}
+
 
 
 @media (min-width: 1200px) {
