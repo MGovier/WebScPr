@@ -75,6 +75,7 @@ OnShopAdmin.functions = (function () {
             };
             OnShop.functions.xhrClient('addCategoryForm.php', callback);
         };
+        document.getElementById('manageCategories').addEventListener('click', manageCategories);
         showAddCategoryFormButton.addEventListener('click', showAddCategoryForm);
     };
 
@@ -92,6 +93,21 @@ OnShopAdmin.functions = (function () {
             }
         };
         xhr.send(formData);
+    };
+
+    var manageCategories = function () {
+        var tableHTML = '<table id=productsTable><caption>Categories</caption><thead><tr><th>Category ID</th><th>Category Name</th><th>Items in Category</th><th>Update</th></tr></thead>';
+        var callback = function (catJSON) {
+            var categories = JSON.parse(catJSON);
+            for (var i = 0; i < categories.length; i++) {
+                var cat = categories[i];
+                tableHTML += '<tr><td>' + cat.CATEGORY_ID + '</td><td>' + cat.CATEGORY_NAME + '</td><td>' + 'lots' + '</td>' +
+                            '<td><button class="editCat" id="' + cat.CATEGORY_ID + '">Edit</button>' +
+                            '<button class="deleteCat" id="' + cat.CATEGORY_ID + '">Remove</button></td></tr>';
+            }
+            document.getElementById('dynamic-content').innerHTML = tableHTML;
+        };
+        OnShop.functions.xhrClient('../API/GET/categories.php', callback);
     };
 
     return {

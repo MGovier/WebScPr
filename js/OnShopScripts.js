@@ -29,7 +29,7 @@ OnShop.functions = (function () {
             catTarget.innerHTML = styleCategories(categories);
             showBasket();
         };
-        xhrClient('API/GET/categories.php', catCallback);
+        xhrClient('API/GET/categories.php?empty=false', catCallback);
         var title = document.getElementById('feature-title');
         title.innerHTML = 'Latest Products';
         var target = document.getElementById('dynamic-content');
