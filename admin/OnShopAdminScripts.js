@@ -101,13 +101,13 @@ OnShopAdmin.functions = (function () {
             var categories = JSON.parse(catJSON);
             for (var i = 0; i < categories.length; i++) {
                 var cat = categories[i];
-                tableHTML += '<tr><td>' + cat.CATEGORY_ID + '</td><td>' + cat.CATEGORY_NAME + '</td><td>' + 'lots' + '</td>' +
+                tableHTML += '<tr><td>' + cat.CATEGORY_ID + '</td><td>' + cat.CATEGORY_NAME + '</td><td>' + cat.COUNT + '</td>' +
                             '<td><button class="editCat" id="' + cat.CATEGORY_ID + '">Edit</button>' +
                             '<button class="deleteCat" id="' + cat.CATEGORY_ID + '">Remove</button></td></tr>';
             }
             document.getElementById('dynamic-content').innerHTML = tableHTML;
         };
-        OnShop.functions.xhrClient('../API/GET/categories.php', callback);
+        OnShop.functions.xhrClient('../API/GET/categories.php?products=count', callback);
     };
 
     return {
