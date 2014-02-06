@@ -21,13 +21,9 @@
 <div class="header">
 	<div class="container">
 		<h1 class="branding-title"><a href="<?php echo BASE_URL; ?>"><?php echo STORE_NAME ?></a></h1>
-			<ul class="nav">
-				<li class="on"><a href="#">Products</a></li>
-				<li><a href="#">About</a></li>
-			</ul>
-			<form method="post" action="search.php" class="searchbar">
-				<input type="search" name="search" id="search" placeholder="Search Products">
-			</form>		
+		<form class="searchbar">
+			<input type="search" name="search" id="search" placeholder="Search Products">
+		</form>	
 	</div>
 </div>
 

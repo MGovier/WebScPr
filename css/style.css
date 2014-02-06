@@ -108,22 +108,22 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 	margin: 0 0.2em;
 }
 
-#sideoptions {
+#side-options {
 	display: block;
 	float: left;
-	max-width: 15%;
+	max-width: 14%;
 	padding: 0;
 	margin: 0;
 	padding-top: 2em;
 }
 
-#sideoptions ul {
+#side-options ul {
 	float: left;
 	padding-left: 0;
-
+	width: 100%;
 }
 
-#sideoptions li {
+#side-options li {
 	list-style: none;
 	margin: 0 auto;
     border: 0.1em solid #e3e1e0;
@@ -137,13 +137,15 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 	box-shadow: inset 0 -0.1em #2558B0;
 	box-shadow: 0.05em 0.1em 0.2em #888;
 	cursor: pointer;
+	-webkit-animation: fadeInDown 0.4s;
+  	animation: fadeInDown 0.4s;
 }
 
-#sideoptions li:hover {
+#side-options li:hover {
 	box-shadow: inset 0em -0.5em 0.5em #2558B0;
 }
 
-#sideoptions a {
+#side-options a {
 	text-decoration: none;
 	color: white;
 	display: block;
@@ -225,7 +227,8 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 }
 
 #products li img {
-    width: 10em;
+    max-width: 10em;
+    max-height: 10em;
     padding: 0.2em;
 }
 
@@ -316,7 +319,7 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 	text-align: right;
 }
 
-#basket {
+#basket ul {
 	display: block;
 	float: left;
 	width: 10em;
@@ -326,6 +329,57 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 #basket p {
 	padding: 0;
 	margin: 0;
+}
+
+/*Animations*/
+
+@-webkit-keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(-2em);
+    transform: translateY(-2em);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(-2em);
+    transform: translateY(-2em);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+    -ms-transform: translateY(0);
+    transform: translateY(0);
+  }
+}
+
+@-webkit-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 
