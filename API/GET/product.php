@@ -17,7 +17,7 @@
 			$product["PRODUCT_IMAGE"] = BASE_URL . $product["PRODUCT_IMAGE"];
 			$product["PRODUCT_URL"] = BASE_URL . "product.php?id=" . $product["PRODUCT_ID"];
 			echo json_encode($product);
-		} else echo "Couldn't prepare query!";
-	} else echo "Error!";
+		} else header("HTTP/1.1 204 No Content");
+	} else header("HTTP/1.1 500 Internal Server Error");
 
 ?>
