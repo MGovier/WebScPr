@@ -29,11 +29,15 @@ OnShop.functions = function () {
     }
 
     function checkURL() {
-        var gets = window.location.search;
-        if ((gets.indexOf('?id') > -1)) {
-            var id = gets.split('=');
-            showProduct(id[id.length-1]);
-        } else {showProducts();}
+        if (document.URL.indexOf('admin') > -1) {
+
+        } else {
+            var gets = window.location.search;
+            if ((gets.indexOf('?id') > -1)) {
+                var id = gets.split('=');
+                showProduct(id[id.length-1]);
+            } else {showProducts();}
+        }
     }
 
     function xhrClient (source, callback) {
