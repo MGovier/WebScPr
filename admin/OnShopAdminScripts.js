@@ -34,7 +34,7 @@ OnShopAdmin.functions = (function () {
         for (var i = 0; i < productsArray.length; i++) {
             var product = productsArray[i];
             returnString += '<tr><td>' + product.PRODUCT_ID + '</td>' +
-                            '<td id="thumbnail"><img src="' + product.PRODUCT_IMAGE + '"></td>' +
+                            '<td class="thumbnail"><img src="' + product.PRODUCT_IMAGE + '"></td>' +
                             '<td>' + product.PRODUCT_NAME  + '</td>' +
                             '<td>' + product.PRODUCT_PRICE + '</td>' +
                             '<td>' + product.PRODUCT_STOCK + '</td>' +

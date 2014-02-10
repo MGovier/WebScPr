@@ -1,10 +1,5 @@
 <?php
-require_once($_SERVER["DOCUMENT_ROOT"] . "/663652/OnShop/inc/config.php");
-
-// Check if an ID has been given, then try get it!
-if (isset($_GET["id"])) {
-	$product_id = intval($_GET["id"]);
-}
+require_once("/inc/config.php");
 
 $pageTitle = "Product";
 $section = "product";

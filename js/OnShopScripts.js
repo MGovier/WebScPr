@@ -30,7 +30,7 @@ OnShop.functions = function () {
 
     function checkURL() {
         if (document.URL.indexOf('admin') > -1) {
-
+            // do nothing.
         } else {
             var gets = window.location.search;
             if ((gets.indexOf('?id') > -1)) {
@@ -104,7 +104,7 @@ OnShop.functions = function () {
     function manageBasket () {
         var basketCookie = getBasketCookie();
         var basketID = basketCookie.substring(13,basketCookie.length);
-        xhrClient('API/GET/basket.php?basket_id=' + basketID, function (response) {
+        xhrClient('API/GET/basketproducts.php?basket_id=' + basketID, function (response) {
             s.dynamicArea.innerHTML = styleBasketTable(JSON.parse(response));
         });
     }
@@ -150,11 +150,13 @@ OnShop.functions = function () {
 
     function filterProducts (productsArray, categoryID) {
         window.history.pushState({cat:categoryID},'Category View!', '');
-        window.addEventListener('popstate', function () {
+        var backFunction = function () {
+            window.removeEventListener('popstate', backFunction);
             showProducts();
-        });
+        };
+        window.addEventListener('popstate', backFunction);
             var matches = [];
-            if (categoryID == -1) {
+            if (categoryID === '-1') {
                 s.dynamicArea.innerHTML = styleProducts(productsArray);
             } else {
                 for (var i = productsArray.length - 1; i >= 0; i--) {
@@ -170,7 +172,10 @@ OnShop.functions = function () {
     function showProduct (productID) {
         s.sideMenu.innerHTML = '<li id="backButton">Back</li>';
         var backListener = function (e) {
-            if (e.target.id === 'backButton') {window.history.back();}
+            if (e.target.id === 'backButton') {
+                s.sideMenu.removeEventListener('click', backListener);
+                loadCategories();
+                showProducts();}
         };
         s.sideMenu.addEventListener('click', backListener);
         showBasket();
@@ -225,21 +230,16 @@ OnShop.functions = function () {
         return '<li><p>' + productsCount + ' in Basket</p><p>Total cost: £' + totalCost + '</p><p>Checkout?</p></li>';
     }
 
-    // This might be a very silly way to do this. SEPERATE CONCERNS.
     function styleBasketTable (basket) {
-        var returnString = '<table id="productsTable"><caption>Summary</caption><thead><tr><th>Product Name</th><th>Product Thumbnail</th><th>Product Price</th><th>Product Quantity</th><th>Quantity Cost</th><th class="update">Update</th></tr></thead><tbody id="basketTableBody"></tbody></table>';
-        var addProduct = function (response) {
-            var productDetails = JSON.parse(response);
-            document.getElementById('basketTableBody').innerHTML += '<tr><td>' + productDetails.PRODUCT_NAME + '</td><td id="thumbnail"><img src="' + productDetails.PRODUCT_IMAGE + '" alt="' + productDetails.PRODUCT_NAME + '">' +
-                            '<td>' + productDetails.PRODUCT_PRICE + '</td><td>NYI</td><td>NYI</td><td>NYI</td></tr>';
-        };
+        var returnString = '<table id="productsTable"><caption>Summary</caption><thead><tr><th>Product Name</th><th>Product Thumbnail</th><th>Product Price</th><th>Product Quantity</th><th>Quantity Cost</th><th class="update">Update</th></tr></thead><tbody id="basketTableBody">';
         for (var i = basket.length - 1; i >= 0; i--) {
             var product = basket[i];
-            xhrClient('API/GET/product.php?id=' + product.PRODUCT_ID, addProduct);
+            returnString += '<tr><td>' + product.PRODUCT_NAME + '</td><td class=thumbnail><img src="' + product.PRODUCT_IMAGE + '" alt="' + product.PRODUCT_NAME + '"></td><td>' +
+                            product.PRODUCT_PRICE + '</td><td>' + product.PRODUCT_QUANTITY +'</td><td>' + product.QUANTITY_COST + '</td></tr>';
         }
-        return returnString;
-
+        return returnString + '</tbody></table>';
     }
+
 
     function styleProduct (product) {
         var formattedProduct = '<div id="product">' +

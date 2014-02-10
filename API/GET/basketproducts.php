@@ -17,9 +17,13 @@
 					while ($row = $basketQueryResult->fetch_assoc()) {
 						$productsDetails = array();
 						$productsDetails["PRODUCT_ID"] = $row["PRODUCT_ID"];
-						$rowQuery = $db->query("SELECT PRODUCT_PRICE FROM PRODUCTS WHERE PRODUCT_ID =" . $row["PRODUCT_ID"]);
-						$rowQueryResult = $rowQuery->fetch_row();
-						$productsDetails["PRODUCT_PRICE"] = floatval($rowQueryResult[0]) * $row["PRODUCT_QUANTITY"];
+						$productsDetails["PRODUCT_QUANTITY"] = $row["PRODUCT_QUANTITY"];
+						$rowQuery = $db->query("SELECT * FROM PRODUCTS WHERE PRODUCT_ID =" . $row["PRODUCT_ID"]);
+						$rowQueryResult = $rowQuery->fetch_assoc();
+						$productsDetails["PRODUCT_PRICE"] = floatval($rowQueryResult["PRODUCT_PRICE"]);
+						$productsDetails["PRODUCT_IMAGE"] = $rowQueryResult["PRODUCT_IMAGE"];
+						$productsDetails["PRODUCT_NAME"] = $rowQueryResult["PRODUCT_NAME"];
+						$productsDetails["QUANTITY_COST"] = $productsDetails["PRODUCT_QUANTITY"] * $rowQueryResult["PRODUCT_PRICE"];
 						$productsArray[] = $productsDetails;
 					}
 					echo json_encode($productsArray);
@@ -29,5 +33,6 @@
 			exit();
 			}
 	} else {
-		echo uniqid() . md5(mt_rand());
-    	}
+		header("HTTP/1.1 406 Not Acceptable");
+		exit();
+	}
