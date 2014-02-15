@@ -1,6 +1,6 @@
 var OnShopAdmin = OnShopAdmin || {};
 
-OnShopAdmin.functions = (function () {
+OnShopAdmin.functions = function () {
     'use strict';
     var getAllProductsAdmin = function () {
         var target = document.getElementById('dynamic-content');
@@ -115,5 +115,5 @@ OnShopAdmin.functions = (function () {
         loaded: loaded
     };
 
-}());
+}();
 window.addEventListener('load', OnShopAdmin.functions.loaded);

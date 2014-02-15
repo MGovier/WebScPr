@@ -34,12 +34,5 @@ function createTables($db) {
 						) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT = 1"))) {
 		return false;
 	}
-	if (!($db->query("CREATE TABLE IF NOT EXISTS `BASKETS` (
-						`BASKET_ID` VARCHAR( 60 ) NOT NULL ,
-						`PRODUCT_ID` INT( 11 ) UNSIGNED NOT NULL,
-						`PRODUCT_QUANTITY` INT( 11 ) NOT NULL 
-						) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci"))) {
-		return false;
-	}
 	return true;
 }

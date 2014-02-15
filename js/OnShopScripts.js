@@ -40,11 +40,11 @@ OnShop.functions = function () {
         }
     }
 
-    function xhrClient (source, callback) {
+    function xhrClient (source, callback, args) {
     var xhr = new XMLHttpRequest();
         xhr.onload = function () {
             if (this.status == '200' || this.status == '304') {
-                callback(this.response);
+                callback(this.response, args);
             } else {
                 callback(this.status);
             }
@@ -73,7 +73,7 @@ OnShop.functions = function () {
             var productsArray = JSON.parse(responseText);
             s.dynamicArea.innerHTML = styleProducts(productsArray);
             s.dynamicArea.classList.remove('loading');
-            enableLiveSearch(s.dynamicArea, productsArray);
+            enableLiveSearch(productsArray);
             var categoryListener = function (e) {
                 if (parseInt(e.target.id))  {
                     filterProducts(productsArray, e.target.id);
@@ -84,50 +84,7 @@ OnShop.functions = function () {
         xhrClient('API/GET/products.php', callback);
     }
 
-    function showBasket () {
-        var basketCookie = getBasketCookie();
-        if (basketCookie === null) {
-            newBasketCookie();
-        } else {
-            var basketID = basketCookie.substring(13,basketCookie.length);
-            var callback = function (response) {
-                if (response !== 204) {
-                    var products = JSON.parse(response);
-                    s.basket.innerHTML = styleBasket(products);
-                    s.basket.addEventListener('click', manageBasket);
-                }
-            };
-            xhrClient('API/GET/basket.php?basket_id=' + basketID, callback);
-        }
-    }
-
-    function manageBasket () {
-        var basketCookie = getBasketCookie();
-        var basketID = basketCookie.substring(13,basketCookie.length);
-        xhrClient('API/GET/basketproducts.php?basket_id=' + basketID, function (response) {
-            s.dynamicArea.innerHTML = styleBasketTable(JSON.parse(response));
-        });
-    }
-
-    function getBasketCookie () {
-        var cookies = document.cookie.split(';');
-        for (var i = cookies.length - 1; i >= 0; i--) {
-            var cookie = cookies[i].trim();
-            if (cookie.indexOf('OnShopBasket') === 0) {
-                return cookie;
-            }
-        }
-        return null;
-    }
-
-    function newBasketCookie () {
-        xhrClient('API/GET/basket.php', function (responseText) {
-            var basketID = responseText;
-            document.cookie = 'OnShopBasket=' + basketID + ';max-age=15768000;expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/';
-        });
-    }
-
-    function enableLiveSearch (target, productsArray) {
+    function enableLiveSearch (productsArray) {
         var searchBox = document.getElementById('search');
         searchBox.addEventListener('keyup', function () {
             var string = searchBox.value.toLowerCase();
@@ -147,6 +104,21 @@ OnShop.functions = function () {
             }
         });
     }
+
+    function showBasket () {
+        var basket = localStorage.BASKET;
+        if (basket !== undefined) {
+            var items = JSON.parse(basket);
+            s.basket.innerHTML = styleBasket(items);
+            s.basket.addEventListener('click', manageBasket);
+        }
+    }
+
+    function manageBasket () {
+        var basket = JSON.parse(localStorage.BASKET);
+        s.dynamicArea.innerHTML = styleBasketTable(basket);
+    }
+
 
     function filterProducts (productsArray, categoryID) {
         window.history.pushState({cat:categoryID},'Category View!', '');
@@ -188,7 +160,7 @@ OnShop.functions = function () {
                 window.onpopstate = showProducts;
                 var addToBasketButton = document.getElementById('addToBasket');
                 addToBasketButton.addEventListener('click', function () {
-                    addToBasket(product);
+                    addToBasket(product, 3);
                 });
             } else {s.dynamicArea.innerHTML = '<p>Sorry, that product couldn\'t be retrieved.</p>';}
         };
@@ -196,23 +168,25 @@ OnShop.functions = function () {
         return false;
     }
 
-    function addToBasket (product) {
-        var basketCookie = getBasketCookie();
-        var basketID = basketCookie.substring(13,basketCookie.length);
-        var formData = new FormData();
-        formData.append('basket_id', basketID);
-        formData.append('product_id', product.PRODUCT_ID);
-        formData.append('action', 'add');
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'API/POST/basket.php', true);
-        xhr.onload = function () {
-            if (this.status === 200 || this.status === 304) {
-                showBasket();
-            } else {
-                s.basket.innerHTML = ('Something went wrong');
-            }
+    function addToBasket (product, quantity) {
+        var newItem = {
+            PRODUCT_ID: product.PRODUCT_ID,
+            PRODUCT_PRICE: product.PRODUCT_PRICE,
+            PRODUCT_QUANTITY: quantity
         };
-        xhr.send(formData);
+        var item = JSON.stringify(newItem);
+        if (localStorage.BASKET !== undefined) {
+            var basket = JSON.parse(localStorage.BASKET);
+            basket.push(item);
+            localStorage.BASKET = JSON.stringify(basket);
+        } else {
+            var newBasket = [];
+            newBasket.push(item);
+            localStorage.BASKET = JSON.stringify(newBasket);
+        }
+        showBasket();
+
+        
     }
 
     /******************************* 
@@ -220,24 +194,29 @@ OnShop.functions = function () {
     ********************************/
 
     function styleBasket (products) {
+        console.log(products);
         var productsCount = products.length + ' Product';
         if (products.length > 1) {productsCount += 's';}
         var totalCost = 0.00;
         for (var i = products.length - 1; i >= 0; i--) {
-            var product = products[i];
-            totalCost += product.PRODUCT_PRICE;
+            var product = JSON.parse(products[i]);
+            totalCost += parseFloat(product.PRODUCT_PRICE);
         }
-        return '<li><p>' + productsCount + ' in Basket</p><p>Total cost: £' + totalCost + '</p><p>Checkout?</p></li>';
+        return '<li><p>' + productsCount + ' in Basket</p><p>Total cost: £' + totalCost + '</p><p>Edit/Checkout?</p></li>';
     }
 
     function styleBasketTable (basket) {
-        var returnString = '<table id="productsTable"><caption>Summary</caption><thead><tr><th>Product Name</th><th>Product Thumbnail</th><th>Product Price</th><th>Product Quantity</th><th>Quantity Cost</th><th class="update">Update</th></tr></thead><tbody id="basketTableBody">';
+        var returnString = '<table id="productsTable"><caption>Summary</caption><thead><tr><th>Product Name</th><th>Product Thumbnail</th><th>Product Price</th><th>Product Quantity</th><th>Quantity Cost</th><th class="update">Update</th></tr></thead><tbody id="basketTableBody"></tbody></table>';
+        var loadProduct = function (response, quantity) {
+            var productDetails = JSON.parse(response);
+            var quantityCost = productDetails.PRODUCT_PRICE * quantity;
+            document.getElementById('basketTableBody').innerHTML += '<tr><td>' + productDetails.PRODUCT_NAME + '</td><td class="thumbnail"><img src="' + productDetails.PRODUCT_IMAGE + '" alt="' + productDetails.PRODUCT_NAME + '">' + '<td>' + productDetails.PRODUCT_PRICE + '</td><td>'+ quantity + '</td><td>'+ quantityCost.toFixed(2) + '</td><td>NYI</td></tr>';
+        };
         for (var i = basket.length - 1; i >= 0; i--) {
-            var product = basket[i];
-            returnString += '<tr><td>' + product.PRODUCT_NAME + '</td><td class=thumbnail><img src="' + product.PRODUCT_IMAGE + '" alt="' + product.PRODUCT_NAME + '"></td><td>' +
-                            product.PRODUCT_PRICE + '</td><td>' + product.PRODUCT_QUANTITY +'</td><td>' + product.QUANTITY_COST + '</td></tr>';
+            var product = JSON.parse(basket[i]);
+            xhrClient('API/GET/product.php?id=' + product.PRODUCT_ID, loadProduct, product.PRODUCT_QUANTITY);
         }
-        return returnString + '</tbody></table>';
+        return returnString;
     }
 
 
