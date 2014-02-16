@@ -46,7 +46,7 @@ OnShop.functions = function () {
             if (this.status == '200' || this.status == '304') {
                 callback(this.response, args);
             } else {
-                callback(this.status);
+                callback(this.status, args);
             }
         };
     xhr.open('GET', source, true);
@@ -116,8 +116,15 @@ OnShop.functions = function () {
 
     function manageBasket () {
         var basket = JSON.parse(localStorage.BASKET);
+        var deleteItem = function (e) {
+            if (parseInt(e.target.parentNode.parentNode.id)) {
+                console.log("this is where i will deal with removing things");
+            }
+        };
         s.dynamicArea.innerHTML = styleBasketTable(basket);
         s.featureTitle.innerHTML = 'My Basket';
+        var target = document.getElementById('productsTable');
+        target.addEventListener('click', deleteItem);
     }
 
 
@@ -162,7 +169,8 @@ OnShop.functions = function () {
                 window.onpopstate = showProducts;
                 var addToBasketButton = document.getElementById('addToBasket');
                 addToBasketButton.addEventListener('click', function () {
-                    addToBasket(product, 3);
+                    var quantity = document.getElementById('quantity').value;
+                    addToBasket(product, quantity);
                 });
             } else {s.dynamicArea.innerHTML = '<p>Sorry, that product couldn\'t be retrieved.</p>';}
         };
@@ -176,14 +184,22 @@ OnShop.functions = function () {
             PRODUCT_PRICE: product.PRODUCT_PRICE,
             PRODUCT_QUANTITY: quantity
         };
-        var item = JSON.stringify(newItem);
         if (localStorage.BASKET !== undefined) {
             var basket = JSON.parse(localStorage.BASKET);
-            basket.push(item);
+            var found = false;
+            for (var i = basket.length - 1; i >= 0; i--) {
+                var itemCheck = JSON.parse(basket[i]);
+                if (itemCheck.PRODUCT_ID === newItem.PRODUCT_ID) {
+                    found = true;
+                    itemCheck.PRODUCT_QUANTITY = parseInt(itemCheck.PRODUCT_QUANTITY) + parseInt(newItem.PRODUCT_QUANTITY);
+                    basket[i] = JSON.stringify(itemCheck);
+                }
+            }
+            if (!found) {basket.push(JSON.stringify(newItem));}
             localStorage.BASKET = JSON.stringify(basket);
         } else {
             var newBasket = [];
-            newBasket.push(item);
+            newBasket.push(JSON.stringify(newItem));
             localStorage.BASKET = JSON.stringify(newBasket);
         }
         showBasket();
@@ -201,21 +217,24 @@ OnShop.functions = function () {
         var totalCost = 0.00;
         for (var i = products.length - 1; i >= 0; i--) {
             var product = JSON.parse(products[i]);
-            totalCost += parseFloat(product.PRODUCT_PRICE);
+            totalCost += parseFloat(product.PRODUCT_PRICE) * parseInt(product.PRODUCT_QUANTITY);
         }
-        return '<li><p>' + productsCount + ' in Basket</p><p>Total cost: £' + totalCost + '</p><p>Edit/Checkout?</p></li>';
+        return '<li><p>' + productsCount + ' in Basket</p><p>Total cost: £' + totalCost.toFixed(2) + '</p><p>Edit/Checkout?</p></li>';
     }
 
     function styleBasketTable (basket) {
         var returnString = '<table id="productsTable"><caption>Summary</caption><thead><tr><th>Product Name</th><th>Product Thumbnail</th><th>Product Price</th><th>Product Quantity</th><th>Quantity Cost</th><th class="update">Update</th></tr></thead><tbody id="basketTableBody"></tbody></table>';
-        var loadProduct = function (response, quantity) {
-            var productDetails = JSON.parse(response);
-            var quantityCost = productDetails.PRODUCT_PRICE * quantity;
-            document.getElementById('basketTableBody').innerHTML += '<tr><td>' + productDetails.PRODUCT_NAME + '</td><td class="thumbnail"><img src="' + productDetails.PRODUCT_IMAGE + '" alt="' + productDetails.PRODUCT_NAME + '">' + '<td>' + productDetails.PRODUCT_PRICE + '</td><td>'+ quantity + '</td><td>'+ quantityCost.toFixed(2) + '</td><td>NYI</td></tr>';
+        var loadProduct = function (response, args) {
+            if (typeof response == 'number') {document.getElementById('basketTableBody').innerHTML += '<tr id="' + args.pid +'"><td colspan="5">Sorry, item ' + args.pid + ' could not be found, it may have been removed!</td><td><button class="removeItem">Remove</button></td></tr>';}
+            else {
+                var productDetails = JSON.parse(response);
+                var quantityCost = productDetails.PRODUCT_PRICE * args.quantity;
+                document.getElementById('basketTableBody').innerHTML += '<tr id="' + args.pid +'"><td>' + productDetails.PRODUCT_NAME + '</td><td class="thumbnail"><img src="' + productDetails.PRODUCT_IMAGE + '" alt="' + productDetails.PRODUCT_NAME + '">' + '<td>' + productDetails.PRODUCT_PRICE + '</td><td>'+ args.quantity + '</td><td>'+ quantityCost.toFixed(2) + '</td><td><button class="removeItem">Remove</button></td></tr>';
+            }
         };
         for (var i = basket.length - 1; i >= 0; i--) {
             var product = JSON.parse(basket[i]);
-            xhrClient('API/GET/product.php?id=' + product.PRODUCT_ID, loadProduct, product.PRODUCT_QUANTITY);
+            xhrClient('API/GET/product.php?id=' + product.PRODUCT_ID, loadProduct, {quantity:product.PRODUCT_QUANTITY, pid:product.PRODUCT_ID});
         }
         return returnString;
     }
@@ -228,8 +247,21 @@ OnShop.functions = function () {
                            '<p id="description">' + product.PRODUCT_DESCRIPTION + '</p>' +
                            '<p id="stock">Stock: ' + product.PRODUCT_STOCK + '</p>' +
                            '<p id="price">Price: ' + product.PRODUCT_PRICE + '</p>' +
-                           '<button id="addToBasket">Add to Basket!</button></div>';
+                           styleAvailableStockSelector(product.PRODUCT_STOCK);
         return formattedProduct;
+    }
+
+    function styleAvailableStockSelector (stockIn) {
+        var stock = parseInt(stockIn);
+        if (stock === 0) {
+            return '<select disabled id="quantity"><option>0</option></select><button disabled id="addToBasket">Add to Basket!</button></div>';
+        } else {
+            var returnString = '<select id="quantity">';
+            for (var i = 0; i <= stock; i++) {
+                returnString += '<option>' + i + '</option>';
+            }
+            return returnString + '</select><button id="addToBasket">Add to Basket!</button></div>';
+        }
     }
 
     function styleProducts (productsArray) {
