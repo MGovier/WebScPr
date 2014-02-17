@@ -81,7 +81,7 @@ OnShop.functions = function () {
             };
             s.sideMenu.addEventListener('click', categoryListener);
         };
-        xhrClient('API/GET/products.php', callback);
+        xhrClient('API/products/', callback);
     }
 
     function enableLiveSearch (productsArray) {
@@ -178,7 +178,7 @@ OnShop.functions = function () {
                 });
             } else {s.dynamicArea.innerHTML = '<p>Sorry, that product couldn\'t be retrieved.</p>';}
         };
-        xhrClient('API/GET/product.php?id=' + productID, callback);
+        xhrClient('api/product/' + productID, callback);
         return false;
     }
 
