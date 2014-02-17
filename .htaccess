@@ -1,0 +1,5 @@
+RewriteEngine On
+
+RewriteRule ^api/product/([0-9]+)$ /663652/index.php
+
+RewriteRule ^soup/product/([0-9]+)$ /663652/index.php
