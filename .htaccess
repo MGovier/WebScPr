@@ -1,5 +1,9 @@
 RewriteEngine On
 
-RewriteRule ^api/product/([0-9]+)$ /663652/index.php
+#Redirect to the correct path if not installed in root. [L] stops next rule matching too.
+RewriteRule ^(.*)/api/product/([0-9]+)$ $1/api/product/index.php?id=$2 [L]
 
-RewriteRule ^soup/product/([0-9]+)$ /663652/index.php
+#Redirect if installed in root.
+RewriteRule ^api/product/([0-9]+)$ api/product/index.php?id=$2
+
+
