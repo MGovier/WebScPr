@@ -95,13 +95,17 @@ OnShop.functions = function () {
                 var productName = product.PRODUCT_NAME.toLowerCase();
                 if (productDescription.indexOf(string) >= 0 || productName.indexOf(string) >= 0) {
                     matches.push(product);
+                    var show = document.getElementById('product' + productsArray[i].PRODUCT_ID);
+                    show.classList.remove('vanish');
+                } else {
+                    var hide = document.getElementById('product' + productsArray[i].PRODUCT_ID);
+                    hide.classList.add('vanish');
                 }
             }
-            if (matches.length !== 0) {
-                s.dynamicArea.innerHTML = styleProducts(matches);
-            } else {
-                s.dynamicArea.innerHTML = '<p>No matches, sorry!</p>';
+            if (matches.length === 0) {
+                s.dynamicArea.innerHTML.append('<p>Sorry, no matching products!</p>');
             }
+
         });
     }
 
@@ -268,7 +272,7 @@ OnShop.functions = function () {
         var formattedProducts = '<ul id="products">';
         for (var i = productsArray.length - 1; i >= 0; i--) {
             var product = productsArray[i];
-            formattedProducts += '<li><a href="' + product.PRODUCT_URL + '"' +
+            formattedProducts += '<li id="product'+ product.PRODUCT_ID + '"><a href="' + product.PRODUCT_URL + '"' +
                             'onclick="return OnShop.functions.showProduct(' + product.PRODUCT_ID + ');"' +
                             '><h4 class="productName">' +
                             product.PRODUCT_NAME + '</h4>' +
