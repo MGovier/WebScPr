@@ -313,7 +313,6 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 .vanish {
   	width: 0 !important;
   	opacity: 0;
-  	display: none;
   	transition: all 0.3s 0.1s;
 }
 
