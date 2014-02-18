@@ -40,7 +40,7 @@ OnShop.functions = function () {
         }
     }
 
-    function xhrClient (source, callback, args) {
+    function xhrClient (method, source, callback, args) {
     var xhr = new XMLHttpRequest();
     xhr.onload = function () {
         if (this.status == '200' || this.status == '304') {
@@ -49,7 +49,7 @@ OnShop.functions = function () {
             callback(this.status, args);
         }
     };
-    xhr.open('GET', source, true);
+    xhr.open(method, source, true);
     xhr.onerror = function () {return 'XHR Error'; };
     xhr.send();
     }
@@ -61,7 +61,7 @@ OnShop.functions = function () {
             s.sideMenu.innerHTML = styleCategories(categories);
             showBasket();
         };
-        xhrClient('api/1/categories/nonempty', catCallback);
+        xhrClient('GET', 'api/1/categories/nonempty', catCallback);
     }
 
     function showProducts () {
@@ -81,7 +81,7 @@ OnShop.functions = function () {
             };
             s.sideMenu.addEventListener('click', categoryListener);
         };
-        xhrClient('api/1/products/', callback);
+        xhrClient('GET', 'api/1/products/', callback);
     }
 
     function enableLiveSearch (productsArray) {
@@ -178,7 +178,7 @@ OnShop.functions = function () {
                 });
             } else {s.dynamicArea.innerHTML = '<p>Sorry, that product couldn\'t be retrieved.</p>';}
         };
-        xhrClient('api/1/product/' + productID, callback);
+        xhrClient('GET', 'api/1/product/' + productID, callback);
         return false;
     }
 
@@ -238,7 +238,7 @@ OnShop.functions = function () {
         };
         for (var i = basket.length - 1; i >= 0; i--) {
             var product = JSON.parse(basket[i]);
-            xhrClient('api/1/product/' + product.PRODUCT_ID, loadProduct, {quantity:product.PRODUCT_QUANTITY, pid:product.PRODUCT_ID});
+            xhrClient('GET', 'api/1/product/' + product.PRODUCT_ID, loadProduct, {quantity:product.PRODUCT_QUANTITY, pid:product.PRODUCT_ID});
         }
         return returnString;
     }

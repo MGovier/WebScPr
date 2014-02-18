@@ -14,7 +14,7 @@ OnShopAdmin.functions = function () {
                 deleteButtons[i].addEventListener('click', deleteItem);
             }
         };
-        OnShop.functions.xhrClient('../api/1/products/stockAsc', callback);
+        OnShop.functions.xhrClient('GET', '../api/1/products/stockAsc', callback);
     }
 
     function deleteItem (e) {
@@ -75,7 +75,7 @@ OnShopAdmin.functions = function () {
                 e.preventDefault();
             });
         };
-        OnShop.functions.xhrClient('addProductForm.php', callback);
+        OnShop.functions.xhrClient('GET', 'addProductForm.php', callback);
     }
 
     function showAddCategoryForm () {
@@ -86,7 +86,7 @@ OnShopAdmin.functions = function () {
                 e.preventDefault();
             });
         };
-        OnShop.functions.xhrClient('addCategoryForm.php', callback);
+        OnShop.functions.xhrClient('GET', 'addCategoryForm.php', callback);
     }
 
     var sendForm = function (method, form) {
@@ -117,7 +117,7 @@ OnShopAdmin.functions = function () {
             }
             document.getElementById('dynamic-content').innerHTML = tableHTML;
         };
-        OnShop.functions.xhrClient('../api/1/categories/products', callback);
+        OnShop.functions.xhrClient('GET', '../api/1/categories/products', callback);
     }
 
     return {
