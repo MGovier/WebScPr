@@ -1,8 +1,9 @@
 <?php 
-	require_once("../../inc/config.php");
+	require_once("../../../inc/config.php");
 	include(ROOT_PATH . "inc/db/database.php");
 	$request = $_SERVER["REQUEST_METHOD"];
 	switch ($request) {
+
 		case 'GET':
 			if (isset($_GET["id"])) {
 				$product_id = intval($_GET["id"]);
@@ -23,6 +24,7 @@
 				} else header("HTTP/1.1 204 No Content");
 			} else header("HTTP/1.1 500 Internal Server Error");
 			break;
+
 		case 'POST':
 			if (empty($_POST["productName"]) 
 				|| empty($_POST["productCategory"]) 
@@ -98,8 +100,41 @@
 				exit();
 			}
 			break;
+
+		case 'PATCH':
+			if (empty($_GET["id"])) {
+				echo '<p class="error">Error! ID field is required.</p>';
+				exit();
+			}
+			$id = intval($_GET["id"]);
+			$query = $db->stmt_init();
+			if ($query->prepare("UPDATE PRODUCTS SET PRODUCT_STOCK = 11 WHERE PRODUCT_ID = ?")) {
+				$query->bind_param("i", $id);
+				$query->execute();
+				echo '<p class="success">Success! Items updated: ' . $query->affected_rows . '.</p>';
+			} else {
+				echo '<p class="error">Error! Could not prepare statement.</p>';
+			}
+			break;
+			
+		case 'DELETE':
+			if (empty($_GET["id"])) {
+				echo '<p class="error">Error! ID field is required.</p>';
+				exit();
+			}
+			$id = intval($_GET["id"]);
+			$query = $db->stmt_init();
+			if ($query->prepare("DELETE FROM PRODUCTS WHERE PRODUCT_ID = ?")) {
+				$query->bind_param("i", $id);
+				$query->execute();
+				echo '<p class="success">Success! Items deleted: ' . $query->affected_rows . '.</p>';
+			} else {
+				echo '<p class="error">Error! Could not prepare statement.</p>';
+			}
+			break;
+
 		default:
-			# code...
+			header ("HTTP/1.1 400 Bad Request");
 			break;
 	}
 	

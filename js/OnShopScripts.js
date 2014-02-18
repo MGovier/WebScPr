@@ -42,13 +42,13 @@ OnShop.functions = function () {
 
     function xhrClient (source, callback, args) {
     var xhr = new XMLHttpRequest();
-        xhr.onload = function () {
-            if (this.status == '200' || this.status == '304') {
-                callback(this.response, args);
-            } else {
-                callback(this.status, args);
-            }
-        };
+    xhr.onload = function () {
+        if (this.status == '200' || this.status == '304') {
+            callback(this.response, args);
+        } else {
+            callback(this.status, args);
+        }
+    };
     xhr.open('GET', source, true);
     xhr.onerror = function () {return 'XHR Error'; };
     xhr.send();
@@ -61,7 +61,7 @@ OnShop.functions = function () {
             s.sideMenu.innerHTML = styleCategories(categories);
             showBasket();
         };
-        xhrClient('API/GET/categories.php?empty=false', catCallback);
+        xhrClient('api/1/categories/nonempty', catCallback);
     }
 
     function showProducts () {
@@ -81,7 +81,7 @@ OnShop.functions = function () {
             };
             s.sideMenu.addEventListener('click', categoryListener);
         };
-        xhrClient('API/products/', callback);
+        xhrClient('api/1/products/', callback);
     }
 
     function enableLiveSearch (productsArray) {
@@ -178,7 +178,7 @@ OnShop.functions = function () {
                 });
             } else {s.dynamicArea.innerHTML = '<p>Sorry, that product couldn\'t be retrieved.</p>';}
         };
-        xhrClient('api/product/' + productID, callback);
+        xhrClient('api/1/product/' + productID, callback);
         return false;
     }
 
@@ -238,7 +238,7 @@ OnShop.functions = function () {
         };
         for (var i = basket.length - 1; i >= 0; i--) {
             var product = JSON.parse(basket[i]);
-            xhrClient('API/GET/product.php?id=' + product.PRODUCT_ID, loadProduct, {quantity:product.PRODUCT_QUANTITY, pid:product.PRODUCT_ID});
+            xhrClient('api/1/product/' + product.PRODUCT_ID, loadProduct, {quantity:product.PRODUCT_QUANTITY, pid:product.PRODUCT_ID});
         }
         return returnString;
     }

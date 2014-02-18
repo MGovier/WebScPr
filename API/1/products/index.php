@@ -1,5 +1,5 @@
 <?php
-	require_once("../../inc/config.php");
+	require_once("../../../inc/config.php");
 	include(ROOT_PATH . "inc/db/database.php");
 	include(ROOT_PATH . "inc/db/insert-demo-products.php");
 	insert_demo_data($db);
@@ -17,4 +17,3 @@
 		$productsArray[] = $row;
 	}
 	echo json_encode($productsArray);
-?>
