@@ -7,13 +7,7 @@
 	<!-- Icons -->
 	<link rel="apple-touch-icon" href="<?php echo BASE_URL; ?>img/assets/apple-icon-touch.png">
 	<link rel="icon" href="<?php echo BASE_URL; ?>img/assets/favicon.png">
-	<!-- Icon and HTML5 support for older IE -->
-	<!--[if IE]>
-  		<link rel="shortcut icon" href="<?php echo BASE_URL; ?>img/assets/favicon.ico">
-	<![endif]-->
-	<!--[if lt IE 9]>
-      	<script src="<?php echo BASE_URL; ?>js/html5shiv.js"></script>
-    <![endif]-->
+	<!-- Javascript -->
     <script src="<?php echo BASE_URL; ?>js/OnShopScripts.js"></script>
     <script src="<?php echo BASE_URL; ?>js/OnShopXHR.js"></script>
 
