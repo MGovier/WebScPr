@@ -362,7 +362,6 @@ OnShop.functions = function () {
     return {
         pageLoaded: pageLoaded,
         showProduct: showProduct,
-        xhrClient: xhrClient,
         manageBasket: manageBasket,
         showFeedback: showFeedback
     };
