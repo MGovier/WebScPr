@@ -9,27 +9,27 @@
 		
 		case 'POST':
 			if (empty($_POST["adminToken"])) {
-				echo '<p class="error">Error! No getting past my incredible security.</p>';
+				echo 'Error! No getting past my incredible security.';
 				exit();
 			} elseif ($_POST["adminToken"] !== "845689458465189121856489418946548479") {
-				echo '<p class="error">Error! No getting past my incredible security.</p>';
+				echo 'Error! No getting past my incredible security.';
 				exit();
 			}
 			if (empty($_POST["categoryName"])) {
-				echo '<p class="error">Error! All fields are required.</p>';
+				echo 'Error! All fields are required.';
 				exit();
 			}	
 			$categoryName = $db->real_escape_string($_POST["categoryName"]);
 			if (!($query = $db->stmt_init())) {
-				echo '<p class="error">Error! Could not initiate query.</p>';
+				echo 'Error! Could not initiate query.';
 				exit();
 			}
 			if ($query->prepare("INSERT INTO CATEGORIES VALUES (NULL,?)")) {
 				$query->bind_param("s", $categoryName);
 				$query->execute();
-				echo '<p class="success">Category successfully inserted.</p>';
+				echo 'Category successfully inserted.';
 			} else {
-				echo '<p class="error">Error! Database insertion problem.</p>';
+				echo 'Error! Database insertion problem.';
 				exit();
 			}
 			break;

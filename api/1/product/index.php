@@ -31,14 +31,14 @@
 				|| empty($_POST["productDescription"]) 
 				|| empty($_POST["productStock"]) 
 				|| empty($_POST["productPrice"])) {
-				echo '<p class="error">Error! All fields are required.</p>';
+				echo 'Error! All fields are required.';
 				exit();
 			}
 			if (empty($_POST["adminToken"])) {
-				echo '<p class="error">Error! No getting past my incredible security.</p>';
+				echo 'Error! No getting past my incredible security.';
 				exit();
 			} elseif ($_POST["adminToken"] !== "845689458465189121856489418946548479") {
-				echo '<p class="error">Error! No getting past my incredible security.</p>';
+				echo 'Error! No getting past my incredible security.';
 				exit();
 			}
 
@@ -56,18 +56,18 @@
 					$categoryIDresultRow = $categoryIDresult->fetch_row();
 					$categoryID = intval($categoryIDresultRow[0]);
 				} else {
-					echo '<p class="error">Error! Category not found.</p>';
+					echo 'Error! Category not found.';
 					exit();
 				}
 			} else {
-				echo '<p class="error">Error! Could not prepare statement.</p>';
+				echo 'Error! Could not prepare statement.';
 				exit();
 			}
 			if ($currentmaxIDquery = $db->query("SELECT MAX(PRODUCT_ID) FROM PRODUCTS")) {
 		            $row = $currentmaxIDquery->fetch_row();
 		            $productID = intval($row[0]) + 1;
 		    } else {
-		            echo '<p class="error">Error! Problem with the database.</p>';
+		            echo 'Error! Problem with the database.';
 		            exit();
 		    }
 		    if (null == ($_FILES["productImage"]["tmp_name"])) {
@@ -94,16 +94,16 @@
 				// int, string, string, string, double, int, int. Phew!
 				$query->bind_param("isssdii", $productID, $productName, $productDescription, $productImage, $productPrice, $productStock, $categoryID);
 				$query->execute();
-				echo '<p class="success">Product successfully inserted.</p>';
+				echo 'Product successfully inserted.';
 			} else {
-				echo '<p class="error">Error! Database insertion problem.</p>';
+				echo 'Error! Database insertion problem.';
 				exit();
 			}
 			break;
 
 		case 'PATCH':
 			if (empty($_REQUEST["id"]) || empty($_REQUEST["stock"])) {
-				echo '<p class="error">Error! ID field is required.</p>';
+				echo 'Error! ID field is required.';
 				exit();
 			}
 			$id = intval($_REQUEST["id"]);
@@ -112,9 +112,9 @@
 			if ($query->prepare("UPDATE PRODUCTS SET PRODUCT_STOCK = ? WHERE PRODUCT_ID = ?")) {
 				$query->bind_param("ii", $stock, $id);
 				$query->execute();
-				echo '<p class="success">Success! Items updated: ' . $query->affected_rows . '.</p>';
+				echo 'Success! Items updated: ' . $query->affected_rows . '.';
 			} else {
-				echo '<p class="error">Error! Could not prepare statement.</p>';
+				echo 'Error! Could not prepare statement.';
 			}
 			break;
 			

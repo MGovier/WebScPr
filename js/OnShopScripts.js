@@ -42,21 +42,6 @@ OnShop.functions = function () {
         }
     }
 
-    function xhrClient (method, source, callback, args) {
-        // rewrite to different library function!
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function () {
-            if (this.status == '200' || this.status == '304') {
-                callback(this.response, args);
-            } else {
-                callback(this.status, args);
-            }
-        };
-        xhr.open(method, source, true);
-        xhr.onerror = function () {return 'XHR Error'; };
-        xhr.send();
-    }
-
     function xhrError (error) {
         showFeedback('Internal error: ' + error, error);
     }

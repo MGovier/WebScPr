@@ -5,8 +5,8 @@ OnShop.admin = function () {
     function getAllProductsAdmin () {
         var target = document.getElementById('dynamic-content');
         target.classList.add('loading');
-        var callback = function (productsArray) {
-            var products = JSON.parse(productsArray);
+        var callback = function (r) {
+            var products = JSON.parse(r.target.responseText);
             target.innerHTML = styleProductsAdmin(products);
             target.classList.remove('loading');
             var deleteButtons = document.querySelectorAll('#productsTable .deleteItem');
@@ -14,27 +14,35 @@ OnShop.admin = function () {
                 deleteButtons[i].addEventListener('click', deleteItem);
             }
         };
-        OnShop.functions.xhrClient('GET', '../api/1/products/stockAsc', callback);
+        OnShop.XHR.load(
+            {
+                'url': '../api/1/products/stockAsc',
+                'callbacks': {
+                    'load': callback,
+                    'error': OnShop.functions.xhrError
+                }
+            }
+        );
     }
 
     function deleteItem (e) {
         var deleteID = e.target.id;
         var check = window.confirm('Are you sure you want to delete item ' + deleteID + '?');
         if (check === true) {
-            var callback = function (response) {
-                OnShop.functions.showFeedback(response, 'notice');
+            var callback = function (r) {
+                OnShop.functions.showFeedback(r.target.responseText, 'notice');
                 getAllProductsAdmin();
                 };
-            var xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-                if (this.status == '200' || this.status == '304') {
-                    callback(this.response);
-                } else {
-                    callback(this.status);
+            OnShop.XHR.load(
+            {
+                'method': 'DELETE',
+                'url': '../api/1/product/' + deleteID,
+                'callbacks': {
+                    'load': callback,
+                    'error': OnShop.functions.xhrError
                 }
-            };
-            xhr.open('DELETE','../api/1/product/' + deleteID, true);
-            xhr.send();
+            }
+            );
         }
     }
 
@@ -69,47 +77,66 @@ OnShop.admin = function () {
     }
 
     function showAddForm () {
-        var callback = function (response) {
-            document.getElementById('dynamic-content').innerHTML = response;
+        var callback = function (r) {
+            document.getElementById('dynamic-content').innerHTML = r.target.responseText;
             document.getElementById('submit').addEventListener('click', function (e) {
-                sendForm('POST', this.form);
+                sendForm(this.form);
                 e.preventDefault();
             });
         };
-        OnShop.functions.xhrClient('GET', 'addProductForm.php', callback);
+        OnShop.XHR.load(
+            {
+                'url': 'addProductForm.php',
+                'callbacks': {
+                    'load': callback,
+                    'error': OnShop.functions.xhrError
+                }
+            }
+        );
     }
 
     function showAddCategoryForm () {
-        var callback = function (response) {
-            document.getElementById('dynamic-content').innerHTML = response;
+        var callback = function (r) {
+            document.getElementById('dynamic-content').innerHTML = r.target.responseText;
             document.getElementById('submit').addEventListener('click', function (e) {
-                sendForm('POST', this.form);
+                sendForm(this.form);
                 e.preventDefault();
             });
         };
-        OnShop.functions.xhrClient('GET', 'addCategoryForm.php', callback);
+        OnShop.XHR.load(
+            {
+                'url': 'addCategoryForm.php',
+                'callbacks': {
+                    'load': callback,
+                    'error': OnShop.functions.xhrError
+                }
+            }
+        );
     }
 
-    var sendForm = function (method, form) {
+    var sendForm = function (form) {
         var formData = new FormData(form);
         formData.append('adminToken', '845689458465189121856489418946548479');
-        var xhr = new XMLHttpRequest();
-        var feedbackTarget = document.getElementById('dynamic-content');
-        xhr.open(method, form.action, true);
-        xhr.onload = function () {
-            if (this.status === 200 || this.status === 301) {
-                feedbackTarget.innerHTML = this.responseText;
-            } else {
-                feedbackTarget.innerHTML = '<p>Something went wrong.</p>';
-            }
+        var callback = function (r) {
+            OnShop.functions.showFeedback(r.target.responseText, 'notice');
         };
-        xhr.send(formData);
+        OnShop.XHR.load(
+            {
+                'method': 'POST',
+                'url': form.action,
+                'data': formData,
+                'callbacks': {
+                    'load': callback,
+                    'error': OnShop.functions.xhrError
+                }
+            }
+        );
     };
 
     function manageCategories () {
         var tableHTML = '<table id=productsTable><caption>Categories</caption><thead><tr><th>Category ID</th><th>Category Name</th><th>Items in Category</th><th>Update</th></tr></thead>';
-        var callback = function (catJSON) {
-            var categories = JSON.parse(catJSON);
+        var callback = function (r) {
+            var categories = JSON.parse(r.target.responseText);
             for (var i = 0; i < categories.length; i++) {
                 var cat = categories[i];
                 tableHTML += '<tr><td>' + cat.CATEGORY_ID + '</td><td>' + cat.CATEGORY_NAME + '</td><td>' + cat.COUNT + '</td>' +
@@ -118,7 +145,15 @@ OnShop.admin = function () {
             }
             document.getElementById('dynamic-content').innerHTML = tableHTML;
         };
-        OnShop.functions.xhrClient('GET', '../api/1/categories/products', callback);
+        OnShop.XHR.load(
+            {
+                'url': '../api/1/categories/products',
+                'callbacks': {
+                    'load': callback,
+                    'error': OnShop.functions.xhrError
+                }
+            }
+        );
     }
 
     return {
