@@ -7,7 +7,7 @@ OnShop.XHR = function () {
 	'use strict';
 
 	function load (r) {
-		var xhr = new XMLHttpRequest();
+		var i, xhr = new XMLHttpRequest();
 
 		if (!r.method) {r.method = 'GET';}
 
@@ -19,13 +19,27 @@ OnShop.XHR = function () {
 			xhr.setRequestHeader('Accept', 'application/json');
 		}
 
-		for (var i in r.callbacks) {
-			if (r.callbacks.hasOwnProperty(i)) {
-				xhr.addEventListener(i, r.callbacks[i]);
+		if (r.args) {
+			xhr.onload = function (e) {
+		        if (this.status == '200' || this.status == '304') {
+		            r.callbacks.load(e, r.args);
+		        } else {
+		            r.callbacks.error(e, r.args);
+		        }
+		    };
+		}
+		else {
+			for (i in r.callbacks) {
+				if (r.callbacks.hasOwnProperty(i)) {
+					xhr.addEventListener(i, r.callbacks[i]);
+				}
 			}
 		}
-
 		xhr.send(r.data);
 	}
+
+	return {
+		'load': load
+	};
 
 }();

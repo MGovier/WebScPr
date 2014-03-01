@@ -57,14 +57,26 @@ OnShop.functions = function () {
         xhr.send();
     }
 
+    function xhrError (error) {
+        showFeedback('Internal error: ' + error, error);
+    }
 
-    function loadCategories() {
-        var catCallback = function (responseText) {
-            var categories = JSON.parse(responseText);
+
+    function loadCategories () {
+        var catCallback = function (r) {
+            var categories = JSON.parse(r.target.responseText);
             s.sideMenu.innerHTML = styleCategories(categories);
             showBasket();
         };
-        xhrClient('GET', 'api/1/categories/nonempty', catCallback);
+        OnShop.XHR.load(
+            {
+                'url': 'api/1/categories/nonempty',
+                'callbacks': {
+                    'load': catCallback,
+                    'error': xhrError
+                }
+            }
+        );
     }
 
     function showProducts () {
@@ -72,8 +84,8 @@ OnShop.functions = function () {
         s.featureTitle.innerHTML = 'Latest Products';
         s.dynamicArea.classList.add('loading');
         window.history.pushState(null, s.shopName, '');
-        var callback = function (responseText) {
-            productsArray = JSON.parse(responseText);
+        var callback = function (r) {
+            productsArray = JSON.parse(r.target.responseText);
             s.dynamicArea.innerHTML = styleProducts(productsArray);
             s.dynamicArea.classList.remove('loading');
             enableLiveSearch(productsArray);
@@ -84,7 +96,15 @@ OnShop.functions = function () {
             };
             s.sideMenu.addEventListener('click', categoryListener);
         };
-        xhrClient('GET', 'api/1/products/', callback);
+        OnShop.XHR.load(
+            {
+                'url': 'api/1/products/',
+                'callbacks': {
+                    'load': callback,
+                    'error': xhrError
+                }
+            }
+        );
 
     }
 
@@ -139,7 +159,6 @@ OnShop.functions = function () {
                 localStorage.BASKET = JSON.stringify(newBasket);
                 showBasket();
                 manageBasket();
-                console.log(product);
                 // add stock back to database!
                 // need to get stock and add quantity to it...
                 // heartbeat? oh man.
@@ -184,9 +203,9 @@ OnShop.functions = function () {
         };
         s.sideMenu.addEventListener('click', backListener);
         showBasket();
-        var callback = function (responseText) {
+        var callback = function (r) {
             if (typeof responseText !== 'number') {
-                var product = JSON.parse(responseText);
+                var product = JSON.parse(r.target.responseText);
                 s.dynamicArea.innerHTML = styleProduct(product);
                 s.featureTitle.innerHTML = product.PRODUCT_NAME;
                 window.history.pushState(null, product.PRODUCT_NAME, 'product.php?id=' + product.PRODUCT_ID);
@@ -198,7 +217,15 @@ OnShop.functions = function () {
                 });
             } else {s.dynamicArea.innerHTML = '<p>Sorry, that product couldn\'t be retrieved.</p>';}
         };
-        xhrClient('GET', 'api/1/product/' + productID, callback);
+        OnShop.XHR.load(
+            {
+                'url': 'api/1/product/' + productID,
+                'callbacks': {
+                    'load': callback,
+                    'error': xhrError
+                }
+            }
+        );
         return false;
     }
 
@@ -251,7 +278,7 @@ OnShop.functions = function () {
         });
         if (level == 'notice') {
             var timeoutID = window.setTimeout(hideFeedback, 3000);
-        };
+        }
     }
 
     function styleBasket (products) {
@@ -267,17 +294,29 @@ OnShop.functions = function () {
 
     function styleBasketTable (basket) {
         var returnString = '<table id="productsTable"><caption>Summary</caption><thead><tr><th>Product Name</th><th>Product Thumbnail</th><th>Product Price</th><th>Product Quantity</th><th>Quantity Cost</th><th class="update">Update</th></tr></thead><tbody id="basketTableBody"></tbody></table>';
-        var loadProduct = function (response, args) {
-            if (typeof response == 'number') {document.getElementById('basketTableBody').innerHTML += '<tr id="' + args.pid +'"><td colspan="5">Sorry, item ' + args.pid + ' could not be found, it may have been removed!</td><td><button class="removeItem">Remove</button></td></tr>';}
+        var loadProduct = function (r, args) {
+            if (typeof response == 'number') {document.getElementById('basketTableBody').innerHTML += '<tr id="' + args.pid +'"><td colspan="5">Sorry, item ' + product.PRODUCT_ID + ' could not be found, it may have been removed!</td><td><button class="removeItem">Remove</button></td></tr>';}
             else {
-                var productDetails = JSON.parse(response);
+                var productDetails = JSON.parse(r.target.responseText);
                 var quantityCost = productDetails.PRODUCT_PRICE * args.quantity;
                 document.getElementById('basketTableBody').innerHTML += '<tr id="' + args.pid +'"><td>' + productDetails.PRODUCT_NAME + '</td><td class="thumbnail"><img src="' + productDetails.PRODUCT_IMAGE + '" alt="' + productDetails.PRODUCT_NAME + '">' + '<td>' + productDetails.PRODUCT_PRICE + '</td><td>'+ args.quantity + '</td><td>'+ quantityCost.toFixed(2) + '</td><td><button class="removeItem">Remove</button></td></tr>';
             }
         };
         for (var i = basket.length - 1; i >= 0; i--) {
             var product = JSON.parse(basket[i]);
-            xhrClient('GET', 'api/1/product/' + product.PRODUCT_ID, loadProduct, {quantity:product.PRODUCT_QUANTITY, pid:product.PRODUCT_ID});
+            OnShop.XHR.load(
+                {
+                    'url': 'api/1/product/' + product.PRODUCT_ID,
+                    'callbacks': {
+                        'load': loadProduct,
+                        'error': xhrError
+                    },
+                    'args': {
+                        quantity:product.PRODUCT_QUANTITY,
+                        pid:product.PRODUCT_ID
+                    }
+                }
+            );
         }
         return returnString;
     }

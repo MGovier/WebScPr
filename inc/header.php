@@ -15,6 +15,7 @@
       	<script src="<?php echo BASE_URL; ?>js/html5shiv.js"></script>
     <![endif]-->
     <script src="<?php echo BASE_URL; ?>js/OnShopScripts.js"></script>
+    <script src="<?php echo BASE_URL; ?>js/OnShopXHR.js"></script>
 
 </head>
 <body>
