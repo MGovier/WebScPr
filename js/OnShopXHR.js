@@ -6,6 +6,16 @@ var OnShop = OnShop || {};
 OnShop.XHR = function () {
 	'use strict';
 
+	function encodePayload (data) {
+		var i, payload = '';
+		for (i in data) {
+			payload += i + '=' + encodeURIComponent(data[i]) + '&';
+		}
+		// remove that pesky last ampersand.
+		payload = payload.slice(0, -1);
+		return payload;
+	}
+
 	function load (r) {
 		var i, xhr = new XMLHttpRequest();
 
@@ -20,13 +30,8 @@ OnShop.XHR = function () {
 		}
 
 		if (r.args) {
-			xhr.onload = function (e) {
-		        if (this.status == '200' || this.status == '304') {
-		            r.callbacks.load(e, r.args);
-		        } else {
-		            r.callbacks.error(e, r.args);
-		        }
-		    };
+			xhr.onload = function (e) { r.callbacks.load(e, r.args); };
+		    xhr.onerror = function (e) { r.callbacks.error(e, r.args); };
 		}
 		else {
 			for (i in r.callbacks) {
@@ -34,6 +39,10 @@ OnShop.XHR = function () {
 					xhr.addEventListener(i, r.callbacks[i]);
 				}
 			}
+		}
+		if (r.method == 'PATCH') {
+			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			r.data = encodePayload(r.data);
 		}
 		xhr.send(r.data);
 	}

@@ -8,18 +8,18 @@
 			break;
 		
 		case 'POST':
-			if (empty($_POST["adminToken"])) {
+			if (empty($_REQUEST["adminToken"])) {
 				echo 'Error! No getting past my incredible security.';
 				exit();
-			} elseif ($_POST["adminToken"] !== "845689458465189121856489418946548479") {
+			} elseif ($_REQUEST["adminToken"] !== "845689458465189121856489418946548479") {
 				echo 'Error! No getting past my incredible security.';
 				exit();
 			}
-			if (empty($_POST["categoryName"])) {
+			if (empty($_REQUEST["categoryName"])) {
 				echo 'Error! All fields are required.';
 				exit();
 			}	
-			$categoryName = $db->real_escape_string($_POST["categoryName"]);
+			$categoryName = $db->real_escape_string($_REQUEST["categoryName"]);
 			if (!($query = $db->stmt_init())) {
 				echo 'Error! Could not initiate query.';
 				exit();

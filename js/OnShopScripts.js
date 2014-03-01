@@ -120,15 +120,36 @@ OnShop.functions = function () {
 
     function showBasket () {
         var basket = localStorage.BASKET;
-        if (basket !== undefined) {
+        if (basket) {
             var items = JSON.parse(basket);
             s.basket.innerHTML = styleBasket(items);
             s.basket.addEventListener('click', manageBasket);
         }
     }
 
+    function changeStock (productID, change) {
+        var callback = function (r) {
+            console.log(r.target.response, 'notice');
+        };
+        OnShop.XHR.load(
+            {
+                'accept': "*/*",
+                'data': {
+                    'id': productID,
+                    'stockChange': change
+                },
+                'method': 'PATCH',
+                'url': 'api/1/product/',
+                'callbacks': {
+                    'load': callback,
+                    'error': xhrError
+                }
+            }
+        );
+    }
+
     function manageBasket () {
-        var basket = JSON.parse(localStorage.BASKET);
+        var productID, quantity, basket = JSON.parse(localStorage.BASKET);
         var deleteItem = function (e) {
             if (parseInt(e.target.parentNode.parentNode.id)) {
                 var basket = JSON.parse(localStorage.BASKET);
@@ -138,14 +159,14 @@ OnShop.functions = function () {
                     if (item.PRODUCT_ID != e.target.parentNode.parentNode.id) {
                         newBasket.push(JSON.stringify(item));
                     } else {
-                        var product = item;
+                        productID = item.PRODUCT_ID;
+                        quantity = item.PRODUCT_QUANTITY;
                     }
                 }
                 localStorage.BASKET = JSON.stringify(newBasket);
                 showBasket();
                 manageBasket();
-                // add stock back to database!
-                // need to get stock and add quantity to it...
+                changeStock(productID, quantity);
                 // heartbeat? oh man.
             }
         };
@@ -220,7 +241,7 @@ OnShop.functions = function () {
             PRODUCT_PRICE: product.PRODUCT_PRICE,
             PRODUCT_QUANTITY: quantity
         };
-        if (localStorage.BASKET !== undefined) {
+        if (localStorage.BASKET) {
             var basket = JSON.parse(localStorage.BASKET);
             var found = false;
             for (var i = basket.length - 1; i >= 0; i--) {
@@ -240,6 +261,7 @@ OnShop.functions = function () {
         }
         showBasket();
         showFeedback('Product added to basket!', 'notice');
+        changeStock(product.PRODUCT_ID, -quantity);
         // decrement stock, move add function to callback
         
     }
@@ -268,7 +290,7 @@ OnShop.functions = function () {
 
     function styleBasket (products) {
         var productsCount = products.length + ' Product';
-        if (products.length > 1) {productsCount += 's';}
+        if (products.length > 1 || products.length === 0) {productsCount += 's';}
         var totalCost = 0.00;
         for (var i = products.length - 1; i >= 0; i--) {
             var product = JSON.parse(products[i]);

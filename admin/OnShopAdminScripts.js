@@ -2,6 +2,7 @@ var OnShop = OnShop || {};
 
 OnShop.admin = function () {
     'use strict';
+    
     function getAllProductsAdmin () {
         var target = document.getElementById('dynamic-content');
         target.classList.add('loading');

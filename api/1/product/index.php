@@ -79,11 +79,11 @@
 				$fileExtension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
 				$allowedExtensions = array("jpg", "jpeg", "png", "webp", "bmp", "gif", "svg");
 				if (!(in_array($fileExtension, $allowedExtensions))) {
-					echo ('<p class="error">Error! Unsupported File Type: ' . $fileExtension . '</p>');
+					echo ('Error! Unsupported File Type: ' . $fileExtension );
 					exit();
 				}
-				if ($file['size'] > 10000000) {
-					echo '<p class="error">Error! File over 10MB.</p>';
+				if ($file['size'] > 12000000) {
+					echo 'Error! Files over 12MB are not supported.';
 					exit();
 				}
 				$productImage = "img/products/" . $productID . '.' . $fileExtension;
@@ -102,12 +102,40 @@
 			break;
 
 		case 'PATCH':
-			if (empty($_REQUEST["id"]) || empty($_REQUEST["stock"])) {
+			// to get data from a PATCH request.
+			parse_str(file_get_contents('php://input'), $requestData); 
+			if (empty($requestData["id"])) {
 				echo 'Error! ID field is required.';
 				exit();
 			}
-			$id = intval($_REQUEST["id"]);
-			$stock = intval($_REQUEST["stock"]);
+			$id = intval($requestData["id"]);
+			if (!(empty($requestData["stockChange"]))) {
+				$currentStockQ = $db->stmt_init();
+				if ($currentStockQ->prepare("SELECT PRODUCT_STOCK FROM PRODUCTS WHERE PRODUCT_ID = ?")) {
+					$currentStockQ->bind_param("i", $id);
+					$currentStockQ->execute();
+					$resultQ = $currentStockQ->get_result();
+					if (mysqli_num_rows($resultQ) === 1) {
+						$resultQRow = $resultQ->fetch_row();
+						$result = intval($resultQRow[0]);
+					} else {
+						echo 'Error! Product not found.';
+						exit();
+					}	
+					if ($requestData["stockChange"] < 0) {
+						if (($result + $requestData["stockChange"]) < 0) {
+							header("HTTP/1.1 403 Forbidden");
+							exit();
+						}
+					}
+					$stockChange = intval($requestData["stockChange"]);
+					$stock = $result + $stockChange;
+				} else {
+					echo 'Error! Could not prepare statement.';
+				}
+			} else {
+				$stock = intval($requestData["stock"]);
+			}
 			$query = $db->stmt_init();
 			if ($query->prepare("UPDATE PRODUCTS SET PRODUCT_STOCK = ? WHERE PRODUCT_ID = ?")) {
 				$query->bind_param("ii", $stock, $id);
