@@ -23,6 +23,8 @@ OnShop.functions = function () {
 
     };
 
+    var productsArray;
+
     function pageLoaded () {
         s.init();
         checkURL();
@@ -41,17 +43,18 @@ OnShop.functions = function () {
     }
 
     function xhrClient (method, source, callback, args) {
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-        if (this.status == '200' || this.status == '304') {
-            callback(this.response, args);
-        } else {
-            callback(this.status, args);
-        }
-    };
-    xhr.open(method, source, true);
-    xhr.onerror = function () {return 'XHR Error'; };
-    xhr.send();
+        // rewrite to different library function!
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            if (this.status == '200' || this.status == '304') {
+                callback(this.response, args);
+            } else {
+                callback(this.status, args);
+            }
+        };
+        xhr.open(method, source, true);
+        xhr.onerror = function () {return 'XHR Error'; };
+        xhr.send();
     }
 
 
@@ -70,7 +73,7 @@ OnShop.functions = function () {
         s.dynamicArea.classList.add('loading');
         window.history.pushState(null, s.shopName, '');
         var callback = function (responseText) {
-            var productsArray = JSON.parse(responseText);
+            productsArray = JSON.parse(responseText);
             s.dynamicArea.innerHTML = styleProducts(productsArray);
             s.dynamicArea.classList.remove('loading');
             enableLiveSearch(productsArray);
@@ -82,9 +85,10 @@ OnShop.functions = function () {
             s.sideMenu.addEventListener('click', categoryListener);
         };
         xhrClient('GET', 'api/1/products/', callback);
+
     }
 
-    function enableLiveSearch (productsArray) {
+    function enableLiveSearch () {
         var searchBox = document.getElementById('search');
         searchBox.addEventListener('keyup', function () {
             var string = searchBox.value.toLowerCase();
@@ -122,7 +126,23 @@ OnShop.functions = function () {
         var basket = JSON.parse(localStorage.BASKET);
         var deleteItem = function (e) {
             if (parseInt(e.target.parentNode.parentNode.id)) {
-                console.log("this is where i will deal with removing things");
+                var basket = JSON.parse(localStorage.BASKET);
+                var newBasket = [];
+                for (var i = basket.length - 1; i >= 0; i--) {
+                    var item = JSON.parse(basket[i]);
+                    if (item.PRODUCT_ID != e.target.parentNode.parentNode.id) {
+                        newBasket.push(JSON.stringify(item));
+                    } else {
+                        var product = item;
+                    }
+                }
+                localStorage.BASKET = JSON.stringify(newBasket);
+                showBasket();
+                manageBasket();
+                console.log(product);
+                // add stock back to database!
+                // need to get stock and add quantity to it...
+                // heartbeat? oh man.
             }
         };
         s.dynamicArea.innerHTML = styleBasketTable(basket);
@@ -207,13 +227,32 @@ OnShop.functions = function () {
             localStorage.BASKET = JSON.stringify(newBasket);
         }
         showBasket();
-
+        showFeedback('Product added to basket!', 'notice');
+        // decrement stock, move add function to callback
         
     }
 
     /******************************* 
     HTML Generation Functions
     ********************************/
+
+    function showFeedback (feedback, level) {
+        var target = document.getElementById('feedback');
+        target.innerHTML = '<p><span id="closeFeedback"> X </span>' + feedback + '</p>';
+        target.classList.remove('vanish');
+        var hideFeedback = function () {
+            target.classList.add('vanish');
+            target.innerHTML = '';
+            window.clearTimeout(timeoutID);
+        };
+        target.addEventListener('click', function () {
+            target.removeEventListener('click', hideFeedback);
+            hideFeedback();
+        });
+        if (level == 'notice') {
+            var timeoutID = window.setTimeout(hideFeedback, 3000);
+        };
+    }
 
     function styleBasket (products) {
         var productsCount = products.length + ' Product';
@@ -261,7 +300,7 @@ OnShop.functions = function () {
             return '<select disabled id="quantity"><option>0</option></select><button disabled id="addToBasket">Add to Basket!</button></div>';
         } else {
             var returnString = '<select id="quantity">';
-            for (var i = 0; i <= stock; i++) {
+            for (var i = 1; i <= stock; i++) {
                 returnString += '<option>' + i + '</option>';
             }
             return returnString + '</select><button id="addToBasket">Add to Basket!</button></div>';
@@ -300,7 +339,8 @@ OnShop.functions = function () {
         pageLoaded: pageLoaded,
         showProduct: showProduct,
         xhrClient: xhrClient,
-        manageBasket: manageBasket
+        manageBasket: manageBasket,
+        showFeedback: showFeedback
     };
 }();
 

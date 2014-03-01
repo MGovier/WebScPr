@@ -102,14 +102,15 @@
 			break;
 
 		case 'PATCH':
-			if (empty($_GET["id"])) {
+			if (empty($_REQUEST["id"]) || empty($_REQUEST["stock"])) {
 				echo '<p class="error">Error! ID field is required.</p>';
 				exit();
 			}
-			$id = intval($_GET["id"]);
+			$id = intval($_REQUEST["id"]);
+			$stock = intval($_REQUEST["stock"]);
 			$query = $db->stmt_init();
-			if ($query->prepare("UPDATE PRODUCTS SET PRODUCT_STOCK = 11 WHERE PRODUCT_ID = ?")) {
-				$query->bind_param("i", $id);
+			if ($query->prepare("UPDATE PRODUCTS SET PRODUCT_STOCK = ? WHERE PRODUCT_ID = ?")) {
+				$query->bind_param("ii", $stock, $id);
 				$query->execute();
 				echo '<p class="success">Success! Items updated: ' . $query->affected_rows . '.</p>';
 			} else {
@@ -118,18 +119,18 @@
 			break;
 			
 		case 'DELETE':
-			if (empty($_GET["id"])) {
+			if (empty($_REQUEST["id"])) {
 				echo '<p class="error">Error! ID field is required.</p>';
 				exit();
 			}
-			$id = intval($_GET["id"]);
+			$id = intval($_REQUEST["id"]);
 			$query = $db->stmt_init();
 			if ($query->prepare("DELETE FROM PRODUCTS WHERE PRODUCT_ID = ?")) {
 				$query->bind_param("i", $id);
 				$query->execute();
-				echo '<p class="success">Success! Items deleted: ' . $query->affected_rows . '.</p>';
+				echo 'Success! Items deleted: ' . $query->affected_rows . '.';
 			} else {
-				echo '<p class="error">Error! Could not prepare statement.</p>';
+				echo 'Error! Could not prepare statement.';
 			}
 			break;
 

@@ -8,6 +8,7 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 <script src="<?php echo BASE_URL; ?>admin/OnShopAdminScripts.js"></script>
 
 <div class="container">
+<div id="feedback" class="vanish"></div>
 	<div id="side-options">
 		<ul id="options">
 			<li id="stockLevels">Manage items</li>

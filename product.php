@@ -6,6 +6,7 @@ $section = "product";
 include(ROOT_PATH . 'inc/header.php'); ?>
 
 <div class="container">
+<div id="feedback" class="vanish"></div>
 	<div id="side-options">
 		<ul id="options">
 		</ul>

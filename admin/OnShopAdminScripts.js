@@ -22,7 +22,8 @@ OnShopAdmin.functions = function () {
         var check = window.confirm('Are you sure you want to delete item ' + deleteID + '?');
         if (check === true) {
             var callback = function (response) {
-                document.getElementById('dynamic-content').innerHTML = response;
+                OnShop.functions.showFeedback(response, 'notice');
+                getAllProductsAdmin();
                 };
             var xhr = new XMLHttpRequest();
             xhr.onload = function () {
