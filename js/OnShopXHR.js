@@ -1,7 +1,7 @@
 // create a namespace for the JS, and ensure nothing is overwritten.
 var OnShop = OnShop || {};
 
-// This XHR function is heavily based off Kit Lester & Rich Boakes's Linora project. 
+// This XHR function is heavily based on Kit Lester & Rich Boakes' Linora project. 
 // Thanks!
 OnShop.XHR = function () {
 	'use strict';
@@ -40,6 +40,7 @@ OnShop.XHR = function () {
 				}
 			}
 		}
+		// Posts use FormData, leaving only PATCH to require an encoded payload.
 		if (r.method == 'PATCH') {
 			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			r.data = encodePayload(r.data);

@@ -79,11 +79,11 @@
 				$fileExtension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
 				$allowedExtensions = array("jpg", "jpeg", "png", "webp", "bmp", "gif", "svg");
 				if (!(in_array($fileExtension, $allowedExtensions))) {
-					echo ('Error! Unsupported File Type: ' . $fileExtension );
+					echo ('Error: Unsupported File Type: ' . $fileExtension );
 					exit();
 				}
 				if ($file['size'] > 12000000) {
-					echo 'Error! Files over 12MB are not supported.';
+					echo 'Error: Files over 12MB would be a little inefficient!.';
 					exit();
 				}
 				$productImage = "img/products/" . $productID . '.' . $fileExtension;
@@ -148,10 +148,25 @@
 			
 		case 'DELETE':
 			if (empty($_REQUEST["id"])) {
-				echo '<p class="error">Error! ID field is required.</p>';
+				echo 'Error! ID field is required.';
 				exit();
 			}
 			$id = intval($_REQUEST["id"]);
+			$picQ = $db->stmt_init();
+			if ($picQ->prepare("SELECT PRODUCT_IMAGE FROM PRODUCTS WHERE PRODUCT_ID = ?")) {
+				$picQ->bind_param("i", $id);
+				$picQ->execute();
+				$resultQ = $picQ->get_result();
+				if (mysqli_num_rows($resultQ) === 1) {
+						$resultQRow = $resultQ->fetch_row();
+						$pictureName = $resultQRow[0];
+					} else {
+						echo 'Error! Product not found.';
+						exit();
+					}
+			} else {
+				echo 'Error! Could not prepare statement.';
+			}
 			$query = $db->stmt_init();
 			if ($query->prepare("DELETE FROM PRODUCTS WHERE PRODUCT_ID = ?")) {
 				$query->bind_param("i", $id);
@@ -160,10 +175,11 @@
 			} else {
 				echo 'Error! Could not prepare statement.';
 			}
+			chdir(ROOT_PATH);
+			unlink($pictureName);
 			break;
 
 		default:
 			header ("HTTP/1.1 400 Bad Request");
 			break;
 	}
-	

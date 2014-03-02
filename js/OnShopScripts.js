@@ -4,7 +4,7 @@ var OnShop = OnShop || {};
 OnShop.functions = function () {
     'use strict';
 
-    var s = {
+    var productsArray, s = {
         settings: {
             dynamicArea: 'dynamic-content',
             shopName: document.title,
@@ -22,8 +22,6 @@ OnShop.functions = function () {
         }
 
     };
-
-    var productsArray;
 
     function pageLoaded () {
         s.init();
@@ -128,12 +126,12 @@ OnShop.functions = function () {
     }
 
     function changeStock (productID, change) {
-        var callback = function (r) {
-            console.log(r.target.response, 'notice');
-        };
+        // var callback = function (r) {
+        //     console.log(r.target.response, 'notice');
+        // };
         OnShop.XHR.load(
             {
-                'accept': "*/*",
+                'accept': '*/*',
                 'data': {
                     'id': productID,
                     'stockChange': change
@@ -141,7 +139,7 @@ OnShop.functions = function () {
                 'method': 'PATCH',
                 'url': 'api/1/product/',
                 'callbacks': {
-                    'load': callback,
+                    // 'load': callback,
                     'error': xhrError
                 }
             }
@@ -209,29 +207,35 @@ OnShop.functions = function () {
         };
         s.sideMenu.addEventListener('click', backListener);
         showBasket();
-        var callback = function (r) {
-            if (typeof responseText !== 'number') {
-                var product = JSON.parse(r.target.responseText);
-                s.dynamicArea.innerHTML = styleProduct(product);
-                s.featureTitle.innerHTML = product.PRODUCT_NAME;
-                window.history.pushState(null, product.PRODUCT_NAME, 'product.php?id=' + product.PRODUCT_ID);
-                window.onpopstate = showProducts;
-                var addToBasketButton = document.getElementById('addToBasket');
-                addToBasketButton.addEventListener('click', function () {
-                    var quantity = document.getElementById('quantity').value;
-                    addToBasket(product, quantity);
-                });
-            } else {s.dynamicArea.innerHTML = '<p>Sorry, that product couldn\'t be retrieved.</p>';}
+        var addToBasketListener = function (product) {
+            var quantity = document.getElementById('quantity').value;
+            addToBasket(product, quantity);
+            loadProduct();
         };
-        OnShop.XHR.load(
-            {
-                'url': 'api/1/product/' + productID,
-                'callbacks': {
-                    'load': callback,
-                    'error': xhrError
+        var loadProduct = function () {
+            var callback = function (r) {
+                if (typeof responseText !== 'number') {
+                    var product = JSON.parse(r.target.responseText);
+                    s.dynamicArea.innerHTML = styleProduct(product);
+                    s.featureTitle.innerHTML = product.PRODUCT_NAME;
+                    window.history.pushState(null, product.PRODUCT_NAME, 'product.php?id=' + product.PRODUCT_ID);
+                    window.onpopstate = showProducts;
+                    var addToBasketButton = document.getElementById('addToBasket');
+                    addToBasketButton.addEventListener('click', function() {addToBasketListener(product);});
+                } else {s.dynamicArea.innerHTML = '<p>Sorry, that product couldn\'t be retrieved.</p>';}
+            };
+            OnShop.XHR.load(
+                {
+                    'url': 'api/1/product/' + productID,
+                    'callbacks': {
+                        'load': callback,
+                        'error': xhrError
+                    }
                 }
-            }
-        );
+            );
+        };
+        loadProduct();
+        window.setInterval(loadProduct, 10000);
         return false;
     }
 
@@ -262,7 +266,6 @@ OnShop.functions = function () {
         showBasket();
         showFeedback('Product added to basket!', 'notice');
         changeStock(product.PRODUCT_ID, -quantity);
-        // decrement stock, move add function to callback
         
     }
 
@@ -378,8 +381,6 @@ OnShop.functions = function () {
         }
         return formattedCategories;
     }
-
-
 
     return {
         pageLoaded: pageLoaded,
