@@ -126,9 +126,12 @@ OnShop.functions = function () {
     }
 
     function changeStock (productID, change) {
-        // var callback = function (r) {
-        //     console.log(r.target.response, 'notice');
-        // };
+        var callback = function () {
+            console.log("yay");
+        };
+        var fail = function () {
+            console.log("Blast");
+        };
         OnShop.XHR.load(
             {
                 'accept': '*/*',
@@ -139,8 +142,8 @@ OnShop.functions = function () {
                 'method': 'PATCH',
                 'url': 'api/1/product/',
                 'callbacks': {
-                    // 'load': callback,
-                    'error': xhrError
+                    'load': callback,
+                    'error': fail
                 }
             }
         );
@@ -200,9 +203,10 @@ OnShop.functions = function () {
 
     function showProduct (productID) {
         s.sideMenu.innerHTML = '<li id="backButton">Back</li>';
-        var backListener = function (e) {
+        var intervalID, backListener = function (e) {
             if (e.target.id === 'backButton') {
                 s.sideMenu.removeEventListener('click', backListener);
+                clearInterval(intervalID);
                 window.history.back();}
         };
         s.sideMenu.addEventListener('click', backListener);
@@ -210,33 +214,67 @@ OnShop.functions = function () {
         var addToBasketListener = function (product) {
             var quantity = document.getElementById('quantity').value;
             addToBasket(product, quantity);
-            loadProduct();
+            refreshStock(productID);
         };
-        var loadProduct = function () {
-            var callback = function (r) {
-                if (typeof responseText !== 'number') {
-                    var product = JSON.parse(r.target.responseText);
-                    s.dynamicArea.innerHTML = styleProduct(product);
-                    s.featureTitle.innerHTML = product.PRODUCT_NAME;
-                    window.history.pushState(null, product.PRODUCT_NAME, 'product.php?id=' + product.PRODUCT_ID);
-                    window.onpopstate = showProducts;
-                    var addToBasketButton = document.getElementById('addToBasket');
-                    addToBasketButton.addEventListener('click', function() {addToBasketListener(product);});
-                } else {s.dynamicArea.innerHTML = '<p>Sorry, that product couldn\'t be retrieved.</p>';}
-            };
-            OnShop.XHR.load(
-                {
-                    'url': 'api/1/product/' + productID,
-                    'callbacks': {
-                        'load': callback,
-                        'error': xhrError
-                    }
+        var callback = function (r) {
+            if (typeof r.target.responseText !== 'number') {
+                var product = JSON.parse(r.target.responseText);
+                s.dynamicArea.innerHTML = styleProduct(product);
+                s.featureTitle.innerHTML = product.PRODUCT_NAME;
+                window.history.pushState(null, product.PRODUCT_NAME, 'product.php?id=' + product.PRODUCT_ID);
+                window.onpopstate = showProducts;
+                var addToBasketButton = document.getElementById('addToBasket');
+                addToBasketButton.addEventListener('click', function() {addToBasketListener(product);});
+                var wrapFunction = function () {
+                    refreshStock(productID);
+                };
+                intervalID = window.setInterval(wrapFunction, 8000);
+            } else {s.dynamicArea.innerHTML = '<p>Sorry, that product couldn\'t be retrieved.</p>';}
+        };
+        OnShop.XHR.load(
+            {
+                'url': 'api/1/product/' + productID,
+                'callbacks': {
+                    'load': callback,
+                    'error': xhrError
                 }
-            );
-        };
-        loadProduct();
-        window.setInterval(loadProduct, 10000);
+            }
+        );
         return false;
+    }
+
+    function refreshStock (productID) {
+        var updateStock = function (r) {
+            var stock = parseInt(r.target.responseText);
+            document.getElementById('stock').innerHTML = 'Stock: ' + stock;
+            var selector = document.getElementById('quantity');
+            if (stock === 0) {
+                selector.disabled = true;
+                document.getElementById('addToBasket').disabled = true;
+            }
+            if (selector.length > stock) {
+                for (var i = selector.length; i >= stock; i--) {
+                    selector.remove(i);
+                }
+            } else if (selector.length < stock) {
+                for (var j = selector.length; j <= stock; j++) {
+                    var option = document.createElement('option');
+                    option.text = j;
+                    selector.add(option);
+                }
+                selector.disabled = false;
+                document.getElementById('addToBasket').disabled = false;
+            }
+        };
+        OnShop.XHR.load(
+            {
+                'url': 'api/1/product/' + productID + '/stock',
+                'callbacks': {
+                    'load': updateStock,
+                    'error': xhrError
+                }
+            }
+        );
     }
 
     function addToBasket (product, quantity) {
@@ -245,6 +283,7 @@ OnShop.functions = function () {
             PRODUCT_PRICE: product.PRODUCT_PRICE,
             PRODUCT_QUANTITY: quantity
         };
+        changeStock(product.PRODUCT_ID, -quantity);
         if (localStorage.BASKET) {
             var basket = JSON.parse(localStorage.BASKET);
             var found = false;
@@ -265,7 +304,6 @@ OnShop.functions = function () {
         }
         showBasket();
         showFeedback('Product added to basket!', 'notice');
-        changeStock(product.PRODUCT_ID, -quantity);
         
     }
 

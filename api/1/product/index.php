@@ -8,21 +8,34 @@
 			if (isset($_GET["id"])) {
 				$product_id = intval($_GET["id"]);
 			} else {
+				header ("HTTP/1.1 400 Bad Request");
 				exit();
 			}
-			$id = $db->real_escape_string($product_id);
-			$query = $db->stmt_init();
-			if ($query->prepare("SELECT * FROM PRODUCTS WHERE PRODUCT_ID=?")) {
-				$query->bind_param("s", $id);
-				$query->execute();
-				$result = $query->get_result();
-				if (mysqli_num_rows($result) === 1) {
-					$product = $result->fetch_assoc();
-					$product["PRODUCT_IMAGE"] = BASE_URL . $product["PRODUCT_IMAGE"];
-					$product["PRODUCT_URL"] = BASE_URL . "product.php?id=" . $product["PRODUCT_ID"];
-					echo json_encode($product);
-				} else header("HTTP/1.1 204 No Content");
-			} else header("HTTP/1.1 500 Internal Server Error");
+			if (isset($_GET["query"]) && $_GET["query"] == 'stock') {
+				$stockQ = $db->stmt_init();
+				if ($stockQ->prepare("SELECT PRODUCT_STOCK FROM PRODUCTS WHERE PRODUCT_ID=?")) {
+					$stockQ->bind_param("i", $product_id);
+					$stockQ->execute();
+					$stockR = $stockQ->get_result();
+					if (mysqli_num_rows($stockR) === 1) {
+						$stockRow = $stockR->fetch_row();
+						echo intval($stockRow[0]);
+					} else header("HTTP/1.1 204 No Content");
+				} else header("HTTP/1.1 500 Internal Server Error");
+			} else {
+				$query = $db->stmt_init();
+				if ($query->prepare("SELECT * FROM PRODUCTS WHERE PRODUCT_ID=?")) {
+					$query->bind_param("i", $product_id);
+					$query->execute();
+					$result = $query->get_result();
+					if (mysqli_num_rows($result) === 1) {
+						$product = $result->fetch_assoc();
+						$product["PRODUCT_IMAGE"] = BASE_URL . $product["PRODUCT_IMAGE"];
+						$product["PRODUCT_URL"] = BASE_URL . "product.php?id=" . $product["PRODUCT_ID"];
+						echo json_encode($product);
+					} else header("HTTP/1.1 204 No Content");
+				} else header("HTTP/1.1 500 Internal Server Error");
+			}
 			break;
 
 		case 'POST':
