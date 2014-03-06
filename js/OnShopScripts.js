@@ -125,19 +125,25 @@ OnShop.functions = function () {
         }
     }
 
-    function changeStock (productID, change) {
-        var callback = function () {
-            console.log("yay");
-        };
-        var fail = function () {
-            console.log("Blast");
-        };
-        OnShop.XHR.load(
+    function changeStock (product, change, direction) {
+        var callback, fail;
+        // fix duplication here.
+        if (direction === 'add') {
+            callback = function (r) {
+                if (r.target.status == '200') {
+                    addToBasket(product, change);
+                    refreshStock(product.PRODUCT_ID);
+                } else fail();
+            };
+            fail = function () {
+                showFeedback('Error with stock levels. Please reload.');
+            };
+            OnShop.XHR.load(
             {
                 'accept': '*/*',
                 'data': {
-                    'id': productID,
-                    'stockChange': change
+                    'id': product.PRODUCT_ID,
+                    'stockChange': -change
                 },
                 'method': 'PATCH',
                 'url': 'api/1/product/',
@@ -147,6 +153,24 @@ OnShop.functions = function () {
                 }
             }
         );
+        } else if (direction === 'remove') {
+            callback = function () {};
+            OnShop.XHR.load(
+                {
+                    'accept': '*/*',
+                    'data': {
+                        'id': product,
+                        'stockChange': change
+                    },
+                    'method': 'PATCH',
+                    'url': 'api/1/product/',
+                    'callbacks': {
+                        'load': callback,
+                        'error': xhrError
+                    }
+                }
+            );
+        }
     }
 
     function manageBasket () {
@@ -167,7 +191,7 @@ OnShop.functions = function () {
                 localStorage.BASKET = JSON.stringify(newBasket);
                 showBasket();
                 manageBasket();
-                changeStock(productID, quantity);
+                changeStock(productID, quantity, 'remove');
                 // heartbeat? oh man.
             }
         };
@@ -213,8 +237,7 @@ OnShop.functions = function () {
         showBasket();
         var addToBasketListener = function (product) {
             var quantity = document.getElementById('quantity').value;
-            addToBasket(product, quantity);
-            refreshStock(productID);
+            changeStock(product, quantity, 'add');
         };
         var callback = function (r) {
             if (typeof r.target.responseText !== 'number') {
@@ -257,7 +280,7 @@ OnShop.functions = function () {
                     selector.remove(i);
                 }
             } else if (selector.length < stock) {
-                for (var j = selector.length; j <= stock; j++) {
+                for (var j = selector.length + 1 ; j <= stock; j++) {
                     var option = document.createElement('option');
                     option.text = j;
                     selector.add(option);
@@ -283,7 +306,6 @@ OnShop.functions = function () {
             PRODUCT_PRICE: product.PRODUCT_PRICE,
             PRODUCT_QUANTITY: quantity
         };
-        changeStock(product.PRODUCT_ID, -quantity);
         if (localStorage.BASKET) {
             var basket = JSON.parse(localStorage.BASKET);
             var found = false;
