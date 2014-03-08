@@ -62,7 +62,9 @@ OnShop.admin = function () {
             var price = priceBox.firstChild.value;
             var callback = function (r) {
                 OnShop.functions.showFeedback(r.target.responseText, 'notice');
-                getAllProductsAdmin();
+                priceBox.innerHTML = price;
+                stockBox.innerHTML = stock;
+                optionsBox.innerHTML = '<td class="optionButtons"><button class="editItem" id="' + updateID + '">Edit</button>' +'<button class="deleteItem" id="' + updateID + '">Remove</button></td>';
                 };
             OnShop.XHR.load({
                 'data': {
