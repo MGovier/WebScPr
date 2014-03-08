@@ -3,15 +3,23 @@
 	include(ROOT_PATH . "inc/db/database.php");
 	$request = $_SERVER["REQUEST_METHOD"];
 	switch ($request) {
-		case 'GET':
-			# code...
+		case 'DELETE':
+			if (isset($_REQUEST["id"])) {
+				$id = intval($_REQUEST["id"]);
+				$query = $db->stmt_init();
+				if ($query->prepare("DELETE FROM `categories` WHERE `CATEGORY_ID` = ?")) {
+					$query->bind_param("i", $id);
+					$query->execute();
+					echo 'Success, categories deleted: ' . $query->affected_rows;
+				} else {
+					echo 'Error! Could not prepare query.';
+					exit();
+				}
+			} else header ("HTTP/1.1 400 Bad Request");
 			break;
 		
 		case 'POST':
-			if (empty($_REQUEST["adminToken"])) {
-				echo 'Error! No getting past my incredible security.';
-				exit();
-			} elseif ($_REQUEST["adminToken"] !== "845689458465189121856489418946548479") {
+			if (empty($_REQUEST["adminToken"]) || $_REQUEST["adminToken"] !== "845689458465189121856489418946548479") {
 				echo 'Error! No getting past my incredible security.';
 				exit();
 			}

@@ -19,7 +19,7 @@
 			}
 			echo json_encode($categoriesArray);
 			break;
-		
+			
 		default:
 			header ("HTTP/1.1 400 Bad Request");
 			break;

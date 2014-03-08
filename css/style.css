@@ -263,15 +263,15 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 	height: 4em;
 }
 
-#productsTable .thumbnail img {
+.productTable .thumbnail img {
 	max-width: 4em;
 }
 
-#productsTable {
+.productTable {
 	margin: 0 auto;
 }
 
-#productsTable td, th {
+.productTable td, th {
 	border: 0.1em solid #e3e1e0;
 	padding: 0.5em;
 }

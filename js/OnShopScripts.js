@@ -31,7 +31,10 @@ OnShop.functions = function () {
     function checkURL() {
         if (document.URL.indexOf('admin') > -1) {
             // do nothing.
-        } else {
+        } else if (document.URL.indexOf('basket') > -1) {
+            manageBasket();
+        }
+        else {
             var gets = window.location.search;
             if ((gets.indexOf('?id') > -1)) {
                 var id = gets.split('=');
@@ -41,7 +44,7 @@ OnShop.functions = function () {
     }
 
     function xhrError (error) {
-        showFeedback('Internal error: ' + error, error);
+        showFeedback('Internal error: ' + error, 'error');
     }
 
 
@@ -63,10 +66,11 @@ OnShop.functions = function () {
     }
 
     function showProducts () {
+        interval.unsetAll();
         loadCategories();
         s.featureTitle.innerHTML = 'Latest Products';
         s.dynamicArea.classList.add('loading');
-        window.history.pushState(null, s.shopName, '');
+        window.history.pushState(null, s.shopName, 'index.php');
         var callback = function (r) {
             productsArray = JSON.parse(r.target.responseText);
             s.dynamicArea.innerHTML = styleProducts(productsArray);
@@ -93,28 +97,60 @@ OnShop.functions = function () {
 
     function enableLiveSearch () {
         var searchBox = document.getElementById('search');
+        // Prevent submitting the search form.
+        searchBox.addEventListener('keydown', function (e) {
+            if (e.keyCode == '13') {e.preventDefault();}
+        });
         searchBox.addEventListener('keyup', function () {
-            var string = searchBox.value.toLowerCase();
+            var strings = searchBox.value.toLowerCase().split(' ');
             var matches = [];
             for (var i = productsArray.length - 1; i >= 0; i--) {
                 var product = productsArray[i];
                 var productDescription = product.PRODUCT_DESCRIPTION.toLowerCase();
                 var productName = product.PRODUCT_NAME.toLowerCase();
-                if (productDescription.indexOf(string) >= 0 || productName.indexOf(string) >= 0) {
-                    matches.push(product);
-                    var show = document.getElementById('product' + productsArray[i].PRODUCT_ID);
-                    show.classList.remove('vanish');
+                var misses = 0;
+                for (var j = strings.length - 1; j >= 0; j--) {
+                    var string = strings[j];
+                    if (!(productDescription.indexOf(string) >= 0 || productName.indexOf(string) >= 0)) {
+                        misses++;
+                    }
+                }
+                var productDOM = document.getElementById('product' + productsArray[i].PRODUCT_ID);
+                if (misses > 0) {
+                    productDOM.classList.add('vanish');
                 } else {
-                    var hide = document.getElementById('product' + productsArray[i].PRODUCT_ID);
-                    hide.classList.add('vanish');
+                    productDOM.classList.remove('vanish');
+                    matches.push(product);
                 }
             }
             if (matches.length === 0) {
-                s.dynamicArea.innerHTML.append('<p>Sorry, no matching products!</p>');
+                showFeedback('Sorry, no matching products!', 'notice');
             }
-
         });
     }
+
+    var interval = {
+        // to keep track of the intervals.
+        intervals: [],
+        set : function (func, delay) {
+            var intervalID = window.setInterval(func, delay);
+            this.intervals.push(intervalID);
+        },
+        unset : function (id) {
+            window.clearInterval(id);
+            for (var i = this.intervals.length - 1; i >= 0; i--) {
+                if (id == this.intervals[i]) {
+                    this.intervals.splice(i,1);
+                }
+            }
+        },
+        unsetAll : function () {
+            for (var i = this.intervals.length - 1; i >= 0; i--) {
+                window.clearInterval(this.intervals[i]);
+            }
+            this.intervals = [];
+        }
+    };
 
     function showBasket () {
         var basket = localStorage.BASKET;
@@ -125,56 +161,54 @@ OnShop.functions = function () {
         }
     }
 
-    function changeStock (product, change, direction) {
-        var callback, fail;
-        // fix duplication here.
+    function changeStock (product, amount, direction) {
+        var change, callback, fail;
         if (direction === 'add') {
             callback = function (r) {
                 if (r.target.status == '200') {
-                    addToBasket(product, change);
+                    addToBasket(product, amount);
                     refreshStock(product.PRODUCT_ID);
                 } else fail();
             };
             fail = function () {
                 showFeedback('Error with stock levels. Please reload.');
             };
-            OnShop.XHR.load(
-            {
-                'accept': '*/*',
-                'data': {
-                    'id': product.PRODUCT_ID,
-                    'stockChange': -change
-                },
-                'method': 'PATCH',
-                'url': 'api/1/product/',
-                'callbacks': {
-                    'load': callback,
-                    'error': fail
-                }
-            }
-        );
+            change = -amount;
         } else if (direction === 'remove') {
             callback = function () {};
-            OnShop.XHR.load(
-                {
-                    'accept': '*/*',
-                    'data': {
-                        'id': product,
-                        'stockChange': change
-                    },
-                    'method': 'PATCH',
-                    'url': 'api/1/product/',
-                    'callbacks': {
-                        'load': callback,
-                        'error': xhrError
-                    }
-                }
-            );
+            fail = function (e) {xhrError(e);};
+            change = amount;
         }
+        OnShop.XHR.load({
+            'accept': 'text/html',
+            'data': {
+                'id': product.PRODUCT_ID,
+                'stockChange': change
+            },
+            'method': 'PATCH',
+            'url': 'api/1/product/',
+            'callbacks': {
+                'load': callback,
+                'error': fail
+            }
+        });
+    }
+
+    function addBackButton () {
+        s.sideMenu.innerHTML = '<li id="backButton">Back To Products</li>';
+        var backListener = function (e) {
+            if (e.target.id === 'backButton') {
+                s.sideMenu.removeEventListener('click', backListener);
+                showProducts();}
+        };
+        s.sideMenu.addEventListener('click', backListener);
     }
 
     function manageBasket () {
-        var productID, quantity, basket = JSON.parse(localStorage.BASKET);
+        addBackButton();
+        var basket = JSON.parse(localStorage.BASKET);
+        interval.unsetAll();
+        window.history.pushState(null, 'My Basket', 'basket.php');
         var deleteItem = function (e) {
             if (parseInt(e.target.parentNode.parentNode.id)) {
                 var basket = JSON.parse(localStorage.BASKET);
@@ -184,20 +218,18 @@ OnShop.functions = function () {
                     if (item.PRODUCT_ID != e.target.parentNode.parentNode.id) {
                         newBasket.push(JSON.stringify(item));
                     } else {
-                        productID = item.PRODUCT_ID;
-                        quantity = item.PRODUCT_QUANTITY;
+                        changeStock(item, item.PRODUCT_QUANTITY, 'remove');
                     }
                 }
                 localStorage.BASKET = JSON.stringify(newBasket);
                 showBasket();
                 manageBasket();
-                changeStock(productID, quantity, 'remove');
                 // heartbeat? oh man.
             }
         };
         s.dynamicArea.innerHTML = styleBasketTable(basket);
         s.featureTitle.innerHTML = 'My Basket';
-        var target = document.getElementById('productsTable');
+        var target = document.getElementById('basketTable');
         target.addEventListener('click', deleteItem);
     }
 
@@ -226,14 +258,7 @@ OnShop.functions = function () {
     }
 
     function showProduct (productID) {
-        s.sideMenu.innerHTML = '<li id="backButton">Back</li>';
-        var intervalID, backListener = function (e) {
-            if (e.target.id === 'backButton') {
-                s.sideMenu.removeEventListener('click', backListener);
-                clearInterval(intervalID);
-                window.history.back();}
-        };
-        s.sideMenu.addEventListener('click', backListener);
+        addBackButton();
         showBasket();
         var addToBasketListener = function (product) {
             var quantity = document.getElementById('quantity').value;
@@ -251,7 +276,7 @@ OnShop.functions = function () {
                 var wrapFunction = function () {
                     refreshStock(productID);
                 };
-                intervalID = window.setInterval(wrapFunction, 8000);
+                interval.set(wrapFunction, 8000);
             } else {s.dynamicArea.innerHTML = '<p>Sorry, that product couldn\'t be retrieved.</p>';}
         };
         OnShop.XHR.load(
@@ -352,8 +377,11 @@ OnShop.functions = function () {
     }
 
     function styleBasket (products) {
+        if (products.length === 0) {
+            return '<li><p>No Products in Basket.</p><p>Why not buy some stuff?!</p></li>';
+        }
         var productsCount = products.length + ' Product';
-        if (products.length > 1 || products.length === 0) {productsCount += 's';}
+        if (products.length > 1) {productsCount += 's';}
         var totalCost = 0.00;
         for (var i = products.length - 1; i >= 0; i--) {
             var product = JSON.parse(products[i]);
@@ -363,7 +391,7 @@ OnShop.functions = function () {
     }
 
     function styleBasketTable (basket) {
-        var returnString = '<table id="productsTable"><caption>Summary</caption><thead><tr><th>Product Name</th><th>Product Thumbnail</th><th>Product Price</th><th>Product Quantity</th><th>Quantity Cost</th><th class="update">Update</th></tr></thead><tbody id="basketTableBody"></tbody></table>';
+        var returnString = '<table class="productTable" id="basketTable"><caption>Summary</caption><thead><tr><th>Product Name</th><th>Product Thumbnail</th><th>Product Price</th><th>Product Quantity</th><th>Quantity Cost</th><th class="update">Update</th></tr></thead><tbody id="basketTableBody"></tbody></table>';
         var loadProduct = function (r, args) {
             if (typeof response == 'number') {document.getElementById('basketTableBody').innerHTML += '<tr id="' + args.pid +'"><td colspan="5">Sorry, item ' + product.PRODUCT_ID + ' could not be found, it may have been removed!</td><td><button class="removeItem">Remove</button></td></tr>';}
             else {

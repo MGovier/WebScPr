@@ -10,7 +10,7 @@ OnShop.admin = function () {
             var products = JSON.parse(r.target.responseText);
             target.innerHTML = styleProductsAdmin(products);
             target.classList.remove('loading');
-            var deleteButtons = document.querySelectorAll('#productsTable .deleteItem');
+            var deleteButtons = document.querySelectorAll('#stockTable .deleteItem');
             for (var i = 0; i < deleteButtons.length; i++) {
                 deleteButtons[i].addEventListener('click', deleteItem);
             }
@@ -34,21 +34,19 @@ OnShop.admin = function () {
                 OnShop.functions.showFeedback(r.target.responseText, 'notice');
                 getAllProductsAdmin();
                 };
-            OnShop.XHR.load(
-            {
+            OnShop.XHR.load({
                 'method': 'DELETE',
                 'url': '../api/1/product/' + deleteID,
                 'callbacks': {
                     'load': callback,
                     'error': OnShop.functions.xhrError
                 }
-            }
-            );
+            });
         }
     }
 
     function styleProductsAdmin (productsArray) {
-        var returnString = '<table id=productsTable><caption>Products Sorted By Stock</caption><thead><tr><th>Product ID</th><th>Product Thumbnail</th><th>Product Name</th><th>Product Price</th><th>Product Stock</th><th>Product Sales (NYI)</th><th class="update">Update</th></tr></thead>';
+        var returnString = '<table class="productTable" id="stockTable"><caption>Products Sorted By Stock</caption><thead><tr><th>Product ID</th><th>Product Thumbnail</th><th>Product Name</th><th>Product Price</th><th>Product Stock</th><th>Product Sales (NYI)</th><th class="update">Update</th></tr></thead>';
         for (var i = 0; i < productsArray.length; i++) {
             var product = productsArray[i];
             returnString += '<tr><td>' + product.PRODUCT_ID + '</td>' +
@@ -135,16 +133,20 @@ OnShop.admin = function () {
     };
 
     function manageCategories () {
-        var tableHTML = '<table id=productsTable><caption>Categories</caption><thead><tr><th>Category ID</th><th>Category Name</th><th>Items in Category</th><th>Update</th></tr></thead>';
+        var tableHTML = '<table class="productTable" id="categoriesTable"><caption>Categories (please note, only empty categories may be removed)</caption><thead><tr><th>Category ID</th><th>Category Name</th><th>Items in Category</th><th>Update</th></tr></thead>';
         var callback = function (r) {
             var categories = JSON.parse(r.target.responseText);
             for (var i = 0; i < categories.length; i++) {
                 var cat = categories[i];
-                tableHTML += '<tr><td>' + cat.CATEGORY_ID + '</td><td>' + cat.CATEGORY_NAME + '</td><td>' + cat.COUNT + '</td>' +
-                            '<td><button class="editCat" id="' + cat.CATEGORY_ID + '">Edit</button>' +
-                            '<button class="deleteCat" id="' + cat.CATEGORY_ID + '">Remove</button></td></tr>';
+                tableHTML += '<tr><td>' + cat.CATEGORY_ID + '</td><td>' + cat.CATEGORY_NAME + '</td><td>' + cat.COUNT + '</td>';
+                if (parseInt(cat.COUNT) === 0) {tableHTML += '<td><button class="deleteCat" id="' + cat.CATEGORY_ID + '">Remove</button></td></tr>';}
+                else {tableHTML += '<td><button disabled>Remove</button></td></tr>';}
             }
             document.getElementById('dynamic-content').innerHTML = tableHTML;
+            var deleteButtons = document.querySelectorAll('#categoriesTable .deleteCat');
+                for (var j = 0; j < deleteButtons.length; j++) {
+                    deleteButtons[j].addEventListener('click', deleteCategory);
+                }
         };
         OnShop.XHR.load(
             {
@@ -157,8 +159,26 @@ OnShop.admin = function () {
         );
     }
 
+    function deleteCategory (e) {
+        var deleteID = e.target.id;
+        var check = window.confirm('Are you sure you want to delete category ' + deleteID + '?');
+        if (check === true) {
+            var callback = function (r) {
+                OnShop.functions.showFeedback(r.target.responseText, 'notice');
+                manageCategories();
+                };
+            OnShop.XHR.load({
+                'method': 'DELETE',
+                'url': '../api/1/category/' + deleteID,
+                'callbacks': {
+                    'load': callback,
+                    'error': OnShop.functions.xhrError
+                }
+            });
+        }
+    }
+
     return {
-        getAllProductsAdmin: getAllProductsAdmin,
         loaded: loaded
     };
 
