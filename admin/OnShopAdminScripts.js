@@ -10,14 +10,7 @@ OnShop.admin = function () {
             var products = JSON.parse(r.target.responseText);
             target.innerHTML = styleProductsAdmin(products);
             target.classList.remove('loading');
-            var deleteButtons = document.querySelectorAll('#stockTable .deleteItem');
-            for (var i = 0; i < deleteButtons.length; i++) {
-                deleteButtons[i].addEventListener('click', deleteItem);
-            }
-            var editButtons = document.querySelectorAll('#stockTable .editItem');
-            for (var k = 0; k < editButtons.length; k++) {
-                editButtons[k].addEventListener('click', editItem);
-            }
+            refreshFormListeners();
         };
         OnShop.XHR.load(
             {
@@ -28,6 +21,17 @@ OnShop.admin = function () {
                 }
             }
         );
+    }
+
+    function refreshFormListeners () {
+        var deleteButtons = document.querySelectorAll('#stockTable .deleteItem');
+        for (var i = 0; i < deleteButtons.length; i++) {
+            deleteButtons[i].addEventListener('click', deleteItem);
+        }
+        var editButtons = document.querySelectorAll('#stockTable .editItem');
+        for (var k = 0; k < editButtons.length; k++) {
+            editButtons[k].addEventListener('click', editItem);
+        }
     }
 
     function deleteItem (e) {
@@ -65,6 +69,7 @@ OnShop.admin = function () {
                 priceBox.innerHTML = price;
                 stockBox.innerHTML = stock;
                 optionsBox.innerHTML = '<td class="optionButtons"><button class="editItem" id="' + updateID + '">Edit</button>' +'<button class="deleteItem" id="' + updateID + '">Remove</button></td>';
+                refreshFormListeners();
                 };
             OnShop.XHR.load({
                 'data': {
