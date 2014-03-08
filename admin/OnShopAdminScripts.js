@@ -14,6 +14,10 @@ OnShop.admin = function () {
             for (var i = 0; i < deleteButtons.length; i++) {
                 deleteButtons[i].addEventListener('click', deleteItem);
             }
+            var editButtons = document.querySelectorAll('#stockTable .editItem');
+            for (var k = 0; k < editButtons.length; k++) {
+                editButtons[k].addEventListener('click', editItem);
+            }
         };
         OnShop.XHR.load(
             {
@@ -45,17 +49,50 @@ OnShop.admin = function () {
         }
     }
 
+    function editItem (e) {
+        var updateID = e.target.id;
+        var stockBox = document.querySelector('#product' + updateID + ' .stock');
+        stockBox.innerHTML = '<input type="number" id="newStock" min="0" value="' + stockBox.innerHTML + '">';
+        var priceBox = document.querySelector('#product' + updateID + ' .price');
+        priceBox.innerHTML = '<input type="number" id="newPrice" min="0" value="' + priceBox.innerHTML + '">';
+        var optionsBox = document.querySelector('#product' + updateID + ' .optionButtons');
+        optionsBox.innerHTML = '<button id="doneEditing">Done</button>';
+        var submit = function () {
+            var stock = stockBox.firstChild.value;
+            var price = priceBox.firstChild.value;
+            var callback = function (r) {
+                OnShop.functions.showFeedback(r.target.responseText, 'notice');
+                getAllProductsAdmin();
+                };
+            OnShop.XHR.load({
+                'data': {
+                    'id': updateID,
+                    'stock': stock,
+                    'price': price
+                },
+                'method': 'PATCH',
+                'url': '../api/1/product/',
+                'callbacks': {
+                    'load': callback,
+                    'error': OnShop.functions.xhrError
+                }
+            });
+        };
+        var doneButton = document.querySelector('#product' + updateID + ' #doneEditing');
+        doneButton.addEventListener('click', submit);
+    }
+
     function styleProductsAdmin (productsArray) {
         var returnString = '<table class="productTable" id="stockTable"><caption>Products Sorted By Stock</caption><thead><tr><th>Product ID</th><th>Product Thumbnail</th><th>Product Name</th><th>Product Price</th><th>Product Stock</th><th>Product Sales (NYI)</th><th class="update">Update</th></tr></thead>';
         for (var i = 0; i < productsArray.length; i++) {
             var product = productsArray[i];
-            returnString += '<tr><td>' + product.PRODUCT_ID + '</td>' +
+            returnString += '<tr id="product' + product.PRODUCT_ID + '"><td>' + product.PRODUCT_ID + '</td>' +
                             '<td class="thumbnail"><img src="' + product.PRODUCT_IMAGE + '"></td>' +
                             '<td>' + product.PRODUCT_NAME  + '</td>' +
-                            '<td>' + product.PRODUCT_PRICE + '</td>' +
-                            '<td>' + product.PRODUCT_STOCK + '</td>' +
+                            '<td class="price">' + product.PRODUCT_PRICE + '</td>' +
+                            '<td class="stock">' + product.PRODUCT_STOCK + '</td>' +
                             '<td>' + 0 + '</td>' +
-                            '<td><button class="editItem" id="' + product.PRODUCT_ID + '">Edit</button>' +
+                            '<td class="optionButtons"><button class="editItem" id="' + product.PRODUCT_ID + '">Edit</button>' +
                             '<button class="deleteItem" id="' + product.PRODUCT_ID + '">Remove</button></td>';
         }
         return returnString + '</table>';

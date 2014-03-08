@@ -122,15 +122,17 @@
 				exit();
 			}
 			$id = intval($requestData["id"]);
+			// they want to do a stock change without specific values 
 			if (!(empty($requestData["stockChange"]))) {
 				$currentStockQ = $db->stmt_init();
-				if ($currentStockQ->prepare("SELECT PRODUCT_STOCK FROM PRODUCTS WHERE PRODUCT_ID = ?")) {
+				if ($currentStockQ->prepare("SELECT PRODUCT_STOCK, PRODUCT_PRICE FROM PRODUCTS WHERE PRODUCT_ID = ?")) {
 					$currentStockQ->bind_param("i", $id);
 					$currentStockQ->execute();
 					$resultQ = $currentStockQ->get_result();
 					if (mysqli_num_rows($resultQ) === 1) {
 						$resultQRow = $resultQ->fetch_row();
 						$result = intval($resultQRow[0]);
+						$price = floatval($resultQRow[1]);
 					} else {
 						echo 'Error! Product not found.';
 						exit();
@@ -146,12 +148,14 @@
 				} else {
 					echo 'Error! Could not prepare statement.';
 				}
+			// otherwise they must be setting stock and price in an update!
 			} else {
 				$stock = intval($requestData["stock"]);
+				$price = floatval($requestData["price"]);
 			}
 			$query = $db->stmt_init();
-			if ($query->prepare("UPDATE PRODUCTS SET PRODUCT_STOCK = ? WHERE PRODUCT_ID = ?")) {
-				$query->bind_param("ii", $stock, $id);
+			if ($query->prepare("UPDATE PRODUCTS SET PRODUCT_STOCK = ?, PRODUCT_PRICE = ? WHERE PRODUCT_ID = ?")) {
+				$query->bind_param("idi", $stock, $price, $id);
 				$query->execute();
 				echo 'Success! Items updated: ' . $query->affected_rows . '.';
 			} else {

@@ -276,6 +276,14 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 	padding: 0.5em;
 }
 
+.productTable input {
+	width: 6em;
+	margin: 0 auto;
+	padding: 0;
+	border: 1px solid red;
+	box-shadow: 0 8px 8px -8px black;
+}
+
 .hidden {
 	display: none;
 }
@@ -380,7 +388,6 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
     opacity: 1;
   }
 }
-
 
 
 @media (min-width: 1200px) {
