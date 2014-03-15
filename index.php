@@ -1,11 +1,9 @@
 <?php 
-
+if (!file_exists("inc/config.php")) {
+	include("inc/install/installer.php");
+	exit();
+}
 require_once("inc/config.php");
-
-// Make a setup script already
-include(ROOT_PATH . "inc/db/database.php");
-include(ROOT_PATH . "inc/db/insert-demo-products.php");
-insert_demo_data($db);
 
 $pageTitle = "Home";
 $section = "home";

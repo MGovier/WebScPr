@@ -1,8 +1,6 @@
 <?php
 	require_once("../../../inc/config.php");
 	include(ROOT_PATH . "inc/db/database.php");
-	include(ROOT_PATH . "inc/db/insert-demo-products.php");
-	insert_demo_data($db);
 	if (isset($_GET["sort"])) {
 		if (strtolower($_GET["sort"]) === "stockasc") {
 			$products = $db->query("SELECT * FROM PRODUCTS ORDER BY PRODUCT_STOCK ASC");	

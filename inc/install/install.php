@@ -36,3 +36,24 @@ function createTables($db) {
 	}
 	return true;
 }
+
+function insert_demo_data($db) {
+	$db->query(file_get_contents(ROOT_PATH . "inc/db/demo_categories.txt"));
+	$db->query(file_get_contents(ROOT_PATH . "inc/db/demo_products.txt"));
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+	$dbAddress = $_POST["dbAddress"];
+	$dbPort = $_POST["dbPort"];
+	$dbUser = $_POST["dbUser"];
+	$dbPass = $_POST["dbPass"];
+	$storeName = $_POST["storeName"];
+	if (isset($_POST["dbDemo"])) {
+		$dbDemo = True;
+	} else  {
+		$dbDemo = False;
+	}
+	
+	$result = array('success' => True, 'message' => "Configuration file created.");
+	echo json_encode($result);
+}
