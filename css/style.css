@@ -24,6 +24,7 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 .header .branding-title {
 	float: left;
 	display: block;
+	color: black;
 }
 
 .header .branding-title a {
