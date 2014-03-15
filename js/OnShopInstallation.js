@@ -50,7 +50,7 @@ OnShop.installation = function () {
 				stage2(formData);
 			} else {
 				document.getElementById('step').innerHTML = '<p>Step 1: Blast, we got this error: ' + response.message + ' Please check the details.';
-				form.classList.remove('vanish', 'slideOut');
+				form.classList.remove('vanish', 'slideOut', 'slideIn');
 				form.classList.add('slideIn');
 			}
 		};
