@@ -1,14 +1,12 @@
 <?php 
 
-function createDatabase($db) {
+function createDatabase($db, $dbName) {
 	// Set up Database
-	if(!$db->query("CREATE DATABASE OnShop663652 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci")) {
-		echo "Database could not be created.";
+	if(!$db->query("CREATE DATABASE " . $dbName ." DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci")) {
 		return false;
 	}
-	$db->select_db(DB_NAME);
+	$db->select_db($dbName);
 	if (!(createTables($db))) {
-		echo "Error while creating the tables.";
 		return false;
 	}
 	return true;
@@ -37,9 +35,10 @@ function createTables($db) {
 	return true;
 }
 
-function insert_demo_data($db) {
-	$db->query(file_get_contents(ROOT_PATH . "inc/db/demo_categories.txt"));
-	$db->query(file_get_contents(ROOT_PATH . "inc/db/demo_products.txt"));
+function insert_demo_data($db, $storeName) {
+	$db->query("USE DATABASE OnShop" . $storeName);
+	$db->query(file_get_contents("install/demo_categories.txt"));
+	$db->query(file_get_contents("install/demo_products.txt"));
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -48,12 +47,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$dbUser = $_POST["dbUser"];
 	$dbPass = $_POST["dbPass"];
 	$storeName = $_POST["storeName"];
-	if (isset($_POST["dbDemo"])) {
-		$dbDemo = True;
-	} else  {
-		$dbDemo = False;
+	$installAddress = $_POST["installAddress"];
+	$dbDemo = $_POST["dbDemo"];
+	$dbName = "OnShop_" . uniqid();
+	chdir("..");
+
+	if (strpos($installAddress, "index.php")) {
+		$installAddress = substr($installAddress, 0, strlen($installAddress) - 9);
 	}
-	
+
+	$db = new mysqli($dbAddress, $dbUser, $dbPass, null, $dbPort);
+
+	if (!createDatabase($db, $dbName)) {
+		$result = array('success' => False, 'message' => "Could not create database.");
+		echo json_encode($result);
+		exit();
+	} else {
+		if ($dbDemo == "true") {
+			insert_demo_data($db, $dbName);
+		}
+	}
+	$file = "config.php";
+	$data = '<?php
+
+    // static variables defined at installation.
+
+	define("BASE_URL","' . $installAddress . '");
+	define("ROOT_PATH",$_SERVER["DOCUMENT_ROOT"] . "' . $installAddress . '");
+
+	define("DB_HOST","' . $dbAddress . '");
+	define("DB_NAME","' . $dbName . '");
+	define("DB_PORT","' . $dbPort . '"); // default for MySQL: 3306
+	define("DB_USER","' . $dbUser . '");
+	define("DB_PASS","' . $dbPass . '");
+
+	// variables from settings.
+
+	define("STORE_NAME","' . $storeName . '");';
+	file_put_contents($file, $data);
 	$result = array('success' => True, 'message' => "Configuration file created.");
 	echo json_encode($result);
 }

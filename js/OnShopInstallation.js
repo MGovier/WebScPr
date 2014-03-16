@@ -28,6 +28,7 @@ OnShop.installation = function () {
 				e.preventDefault();
 				formData.append('storeName', document.getElementById('storeName').value);
 				formData.append('dbDemo', document.getElementById('dbDemo').checked);
+				formData.append('installAddress', window.location.href.split(window.location.host)[1]);
 				sendForm2(this.form.action, formData);
 				this.form.classList.add('slideOut', 'vanish');
 				intro.classList.add('slideOut', 'vanish');
@@ -72,7 +73,7 @@ OnShop.installation = function () {
 		var callback = function (r) {
 			var response = JSON.parse(r.target.responseText);
 			if (response.success) {
-				document.getElementById('step').innerHTML = '<button class="slideIn" id="showStore">Take me to my new store!</button>';
+				document.getElementById('step').innerHTML = '<a href="' + window.location.href +'"><button class="slideIn" id="showStore">Take me to my new store!</button></a>';
 				done();
 			} else {
 				document.getElementById('step').innerHTML = '<p>Step 2: Blast, we got this error: ' + response.message + ' Please start again (sorry).';
