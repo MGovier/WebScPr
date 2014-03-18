@@ -1,6 +1,7 @@
 <?php 
 	require_once("../../../inc/config.php");
 	require(ROOT_PATH . "inc/db/database.php");
+	require(ROOT_PATH . "inc/lib/lib.php");
 	$request = $_SERVER["REQUEST_METHOD"];
 	switch ($request) {
 
@@ -15,21 +16,15 @@
 				$stockQ = $db->stmt_init();
 				if ($stockQ->prepare("SELECT PRODUCT_STOCK FROM PRODUCTS WHERE PRODUCT_ID=?")) {
 					$stockQ->bind_param("i", $product_id);
-					$stockQ->execute();
-					$stockR = $stockQ->get_result();
-					if (mysqli_num_rows($stockR) === 1) {
-						$stockRow = $stockR->fetch_row();
-						echo intval($stockRow[0]);
+					if ($result = retrieve_single_row($stockQ)) {
+						echo intval($result["PRODUCT_STOCK"]);
 					} else header("HTTP/1.1 204 No Content");
 				} else header("HTTP/1.1 500 Internal Server Error");
 			} else {
 				$query = $db->stmt_init();
 				if ($query->prepare("SELECT * FROM PRODUCTS WHERE PRODUCT_ID=?")) {
 					$query->bind_param("i", $product_id);
-					$query->execute();
-					$result = $query->get_result();
-					if (mysqli_num_rows($result) === 1) {
-						$product = $result->fetch_assoc();
+					if ($product = retrieve_single_row($query)) {
 						$product["PRODUCT_IMAGE"] = BASE_URL . $product["PRODUCT_IMAGE"];
 						$product["PRODUCT_URL"] = BASE_URL . "product.php?id=" . $product["PRODUCT_ID"];
 						echo json_encode($product);
@@ -60,14 +55,11 @@
 			$productDescription = $db->real_escape_string($_POST["productDescription"]);
 			$productStock = intval($db->real_escape_string($_POST["productStock"]));
 			$productPrice = floatval($db->real_escape_string($_POST["productPrice"]));
-			$categoryIDquery = $db->stmt_init();
-			if ($categoryIDquery->prepare("SELECT CATEGORY_ID FROM CATEGORIES WHERE CATEGORY_NAME LIKE ?")) {
-				$categoryIDquery->bind_param("s", $productCategory);
-				$categoryIDquery->execute();
-				$categoryIDresult = $categoryIDquery->get_result();
-				if (mysqli_num_rows($categoryIDresult) === 1) {
-					$categoryIDresultRow = $categoryIDresult->fetch_row();
-					$categoryID = intval($categoryIDresultRow[0]);
+			$catIDquery = $db->stmt_init();
+			if ($catIDquery->prepare("SELECT CATEGORY_ID FROM CATEGORIES WHERE CATEGORY_NAME LIKE ?")) {
+				$catIDquery->bind_param("s", $productCategory);
+				if ($result = retrieve_single_row($catIDquery)) {
+					$categoryID = intval($result["CATEGORY_ID"]);
 				} else {
 					echo 'Error! Category not found.';
 					exit();
@@ -95,8 +87,8 @@
 					echo ('Error: Unsupported File Type: ' . $fileExtension );
 					exit();
 				}
-				if ($file['size'] > 12000000) {
-					echo 'Error: Files over 12MB would be a little inefficient!.';
+				if ($file['size'] > 8000000) {
+					echo 'Error: Files over 8MB would be a little inefficient!.';
 					exit();
 				}
 				$productImage = "img/products/" . $productID . '.' . $fileExtension;
@@ -115,28 +107,26 @@
 			break;
 
 		case 'PATCH':
-			// to get data from a PATCH request.
+			// Get data from a PATCH request.
 			parse_str(file_get_contents('php://input'), $requestData); 
 			if (empty($requestData["id"])) {
 				echo 'Error! ID field is required.';
 				exit();
 			}
 			$id = intval($requestData["id"]);
-			// they want to do a stock change without specific values 
+			// They want to do a stock change without specific values.
 			if (!(empty($requestData["stockChange"]))) {
 				$currentStockQ = $db->stmt_init();
 				if ($currentStockQ->prepare("SELECT PRODUCT_STOCK, PRODUCT_PRICE FROM PRODUCTS WHERE PRODUCT_ID = ?")) {
 					$currentStockQ->bind_param("i", $id);
-					$currentStockQ->execute();
-					$resultQ = $currentStockQ->get_result();
-					if (mysqli_num_rows($resultQ) === 1) {
-						$resultQRow = $resultQ->fetch_row();
-						$result = intval($resultQRow[0]);
-						$price = floatval($resultQRow[1]);
+					if ($resultRow = retrieve_single_row($currentStockQ)) {
+						$result = intval($resultRow["PRODUCT_STOCK"]);
+						$price = floatval($resultRow["PRODUCT_PRICE"]);
 					} else {
 						echo 'Error! Product not found.';
 						exit();
-					}	
+					}
+					// Block requests which would put us in negative stock.	
 					if ($requestData["stockChange"] < 0) {
 						if (($result + $requestData["stockChange"]) < 0) {
 							header("HTTP/1.1 403 Forbidden");
@@ -148,7 +138,7 @@
 				} else {
 					echo 'Error! Could not prepare statement.';
 				}
-			// otherwise they must be setting stock and price in an update!
+			// Otherwise they must be setting stock and price in an update!
 			} else {
 				$stock = intval($requestData["stock"]);
 				$price = floatval($requestData["price"]);
@@ -173,10 +163,8 @@
 			if ($picQ->prepare("SELECT PRODUCT_IMAGE FROM PRODUCTS WHERE PRODUCT_ID = ?")) {
 				$picQ->bind_param("i", $id);
 				$picQ->execute();
-				$resultQ = $picQ->get_result();
-				if (mysqli_num_rows($resultQ) === 1) {
-						$resultQRow = $resultQ->fetch_row();
-						$pictureName = $resultQRow[0];
+				if ($result = retrieve_single_row($picQ)) {
+						$pictureName = $result["PRODUCT_IMAGE"];
 					} else {
 						echo 'Error! Product not found.';
 						exit();
