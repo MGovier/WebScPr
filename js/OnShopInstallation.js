@@ -1,6 +1,6 @@
-var OnShop = OnShop || {};
+var onShop = onShop || {};
 
-OnShop.installation = function () {
+onShop.installation = function () {
 	'use strict';
 	var stepStatus, intro;
 	function loaded () {
@@ -11,6 +11,7 @@ OnShop.installation = function () {
 			if (this.form.checkValidity()) {
 				e.preventDefault();
 				sendForm1(this.form);
+				this.form.classList.remove('slideInFromLeft');
 				this.form.classList.add('slideOut', 'vanish');
 				stepStatus.classList.add('slideIn');
 				stepStatus.innerHTML = '<p>Ok, testing that out! Please wait...</p>';
@@ -31,13 +32,11 @@ OnShop.installation = function () {
 				formData.append('installAddress', window.location.href.split(window.location.host)[1]);
 				sendForm2(this.form.action, formData);
 				this.form.classList.add('slideOut', 'vanish');
-				intro.classList.add('slideOut', 'vanish');
 			}
 		});
 	}
 
 	function done () {
-		intro.classList.remove('slideOut', 'vanish');
 		intro.classList.add('slideIn');
 		intro.innerHTML = '<p>Installation complete!</p><p>We hope you enjoy using your new web store, built with valid HTML5, CSS3, PHP and Javascript :-)</p>';
 	}
@@ -52,13 +51,13 @@ OnShop.installation = function () {
 			} else {
 				document.getElementById('step').innerHTML = '<p>Step 1: Blast, we got this error: ' + response.message + ' Please check the details.';
 				form.classList.remove('vanish', 'slideOut', 'slideIn');
-				form.classList.add('slideIn');
+				form.classList.add('slideInFromLeft');
 			}
 		};
 		var error = function () {
 			stepStatus.innerHTML = '<p>It seems parts of the application can\'t be found. Try re-copying your folders!</p>';
 		};
-		OnShop.XHR.load({
+		onShop.XHR.load({
 				'method': 'POST',
 				'url': form.action,
 				'data': formData,
@@ -76,13 +75,13 @@ OnShop.installation = function () {
 				document.getElementById('step').innerHTML = '<a href="' + window.location.href +'"><button class="slideIn" id="showStore">Take me to my new store!</button></a>';
 				done();
 			} else {
-				document.getElementById('step').innerHTML = '<p>Step 2: Blast, we got this error: ' + response.message + ' Please start again (sorry).';
+				document.getElementById('step').innerHTML = '<p>Step 2: Blast, we got this error: ' + response.message + ' Please refresh and start again (sorry).';
 			}
 		};
 		var error = function () {
 			stepStatus.innerHTML = '<p>It seems parts of the application can\'t be found. Try re-copying your folders!</p>';
 		};
-		OnShop.XHR.load({
+		onShop.XHR.load({
 				'method': 'POST',
 				'url': action,
 				'data': formData,
@@ -99,4 +98,4 @@ OnShop.installation = function () {
 
 }();
 
-window.addEventListener('load', OnShop.installation.loaded);
+window.addEventListener('load', onShop.installation.loaded);

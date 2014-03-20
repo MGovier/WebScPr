@@ -19,10 +19,7 @@
 			break;
 		
 		case 'POST':
-			if (empty($_REQUEST["adminToken"]) || $_REQUEST["adminToken"] !== "845689458465189121856489418946548479") {
-				echo 'Error! No getting past my incredible security.';
-				exit();
-			}
+
 			if (empty($_REQUEST["categoryName"])) {
 				echo 'Error! All fields are required.';
 				exit();

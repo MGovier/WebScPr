@@ -8,8 +8,8 @@
 	<link rel="apple-touch-icon" href="<?php echo BASE_URL; ?>img/assets/apple-icon-touch.png">
 	<link rel="icon" href="<?php echo BASE_URL; ?>img/assets/favicon.png">
 	<!-- Javascript -->
-    <script src="<?php echo BASE_URL; ?>js/OnShopScripts.js"></script>
-    <script src="<?php echo BASE_URL; ?>js/OnShopXHR.js"></script>
+    <script src="<?php echo BASE_URL; ?>js/onShopScripts.js"></script>
+    <script src="<?php echo BASE_URL; ?>js/onShopXHR.js"></script>
 
 </head>
 <body>

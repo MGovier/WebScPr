@@ -296,9 +296,19 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 }
 
 .adminForm input {
-	display: block;
-	max-width: 60%;
+	display: inline-block;
+	max-width: 70%;
+	width: 50%;
+}
 
+.adminForm #submit {
+	display: block;
+	background: linear-gradient(to bottom, #2558b0 0%, #4096ee 100%);
+	height: 2em;
+	color: snow;
+	font-size: 1em;
+	box-shadow: 0 0 0.2em #888;
+	transition: all .2s ease;
 }
 
 .adminForm label {

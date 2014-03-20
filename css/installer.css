@@ -56,6 +56,11 @@ form button:hover {
 	-webkit-animation: slideIn 0.8s;
 }
 
+.slideInFromLeft {
+	animation: slideInFromLeft 0.8s;
+	-webkit-animation: slideInFromLeft 0.8s;	
+}
+
 @-webkit-keyframes logoHueRotate {
 	0% {
 		color: #2558b0;
@@ -126,6 +131,32 @@ form button:hover {
 		opacity: 0;
 		-webkit-transform: translateX(200em);
 		transform: translateX(200em);
+	}
+
+	100% {
+		-webkit-transform: translateX(0);
+		transform: translateX(0);
+	}
+}
+
+@-webkit-keyframes slideInFromLeft {
+	0% {
+		opacity: 0;
+		-webkit-transform: translateX(-200em);
+		transform: translateX(-200em);
+	}
+
+	100% {
+		-webkit-transform: translateX(0);
+		transform: translateX(0);
+	}
+}
+
+@keyframes slideInFromLeft {
+	0% {
+		opacity: 0;
+		-webkit-transform: translateX(-200em);
+		transform: translateX(-200em);
 	}
 
 	100% {

@@ -9,8 +9,8 @@
 	<link rel="apple-touch-icon" href="img/assets/apple-icon-touch.png">
 	<link rel="icon" href="img/assets/favicon.png">
 	<!-- Javascript -->
-    <script src="js/OnShopXHR.js"></script>
-    <script src="js/OnShopInstallation.js"></script>
+    <script src="js/onShopXHR.js"></script>
+    <script src="js/onShopInstallation.js"></script>
 </head>
 <body>
 <div class="header">

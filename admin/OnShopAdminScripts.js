@@ -1,6 +1,6 @@
-var OnShop = OnShop || {};
+var onShop = onShop || {};
 
-OnShop.admin = function () {
+onShop.admin = function () {
     'use strict';
     
     function getAllProductsAdmin () {
@@ -12,12 +12,12 @@ OnShop.admin = function () {
             target.classList.remove('loading');
             refreshFormListeners();
         };
-        OnShop.XHR.load(
+        onShop.XHR.load(
             {
                 'url': '../api/1/products/stockAsc',
                 'callbacks': {
                     'load': callback,
-                    'error': OnShop.functions.xhrError
+                    'error': onShop.functions.xhrError
                 }
             }
         );
@@ -39,15 +39,15 @@ OnShop.admin = function () {
         var check = window.confirm('Are you sure you want to delete item ' + deleteID + '?');
         if (check === true) {
             var callback = function (r) {
-                OnShop.functions.showFeedback(r.target.responseText, 'notice');
+                onShop.functions.showFeedback(r.target.responseText, 'notice');
                 getAllProductsAdmin();
                 };
-            OnShop.XHR.load({
+            onShop.XHR.load({
                 'method': 'DELETE',
                 'url': '../api/1/product/' + deleteID,
                 'callbacks': {
                     'load': callback,
-                    'error': OnShop.functions.xhrError
+                    'error': onShop.functions.xhrError
                 }
             });
         }
@@ -65,13 +65,13 @@ OnShop.admin = function () {
             var stock = stockBox.firstChild.value;
             var price = priceBox.firstChild.value;
             var callback = function (r) {
-                OnShop.functions.showFeedback(r.target.responseText, 'notice');
+                onShop.functions.showFeedback(r.target.responseText, 'notice');
                 priceBox.innerHTML = price;
                 stockBox.innerHTML = stock;
                 optionsBox.innerHTML = '<td class="optionButtons"><button class="editItem" id="' + updateID + '">Edit</button>' +'<button class="deleteItem" id="' + updateID + '">Remove</button></td>';
                 refreshFormListeners();
                 };
-            OnShop.XHR.load({
+            onShop.XHR.load({
                 'data': {
                     'id': updateID,
                     'stock': stock,
@@ -81,7 +81,7 @@ OnShop.admin = function () {
                 'url': '../api/1/product/',
                 'callbacks': {
                     'load': callback,
-                    'error': OnShop.functions.xhrError
+                    'error': onShop.functions.xhrError
                 }
             });
         };
@@ -123,16 +123,18 @@ OnShop.admin = function () {
         var callback = function (r) {
             document.getElementById('dynamic-content').innerHTML = r.target.responseText;
             document.getElementById('submit').addEventListener('click', function (e) {
-                sendForm(this.form);
-                e.preventDefault();
+                if (this.form.checkValidity()) {
+                    e.preventDefault()
+                    sendForm(this.form);
+                }
             });
         };
-        OnShop.XHR.load(
+        onShop.XHR.load(
             {
                 'url': 'addProductForm.php',
                 'callbacks': {
                     'load': callback,
-                    'error': OnShop.functions.xhrError
+                    'error': onShop.functions.xhrError
                 }
             }
         );
@@ -141,17 +143,19 @@ OnShop.admin = function () {
     function showAddCategoryForm () {
         var callback = function (r) {
             document.getElementById('dynamic-content').innerHTML = r.target.responseText;
-            document.getElementById('submit').addEventListener('click', function (e) {
-                sendForm(this.form);
-                e.preventDefault();
+            document.getElementById('submitCat').addEventListener('click', function (e) {
+                if (this.form.checkValidity()) {
+                    e.preventDefault()
+                    sendForm(this.form);
+                }
             });
         };
-        OnShop.XHR.load(
+        onShop.XHR.load(
             {
                 'url': 'addCategoryForm.php',
                 'callbacks': {
                     'load': callback,
-                    'error': OnShop.functions.xhrError
+                    'error': onShop.functions.xhrError
                 }
             }
         );
@@ -159,18 +163,17 @@ OnShop.admin = function () {
 
     var sendForm = function (form) {
         var formData = new FormData(form);
-        formData.append('adminToken', '845689458465189121856489418946548479');
         var callback = function (r) {
-            OnShop.functions.showFeedback(r.target.responseText, 'notice');
+            onShop.functions.showFeedback(r.target.responseText, 'notice');
         };
-        OnShop.XHR.load(
+        onShop.XHR.load(
             {
                 'method': 'POST',
                 'url': form.action,
                 'data': formData,
                 'callbacks': {
                     'load': callback,
-                    'error': OnShop.functions.xhrError
+                    'error': onShop.functions.xhrError
                 }
             }
         );
@@ -192,12 +195,12 @@ OnShop.admin = function () {
                     deleteButtons[j].addEventListener('click', deleteCategory);
                 }
         };
-        OnShop.XHR.load(
+        onShop.XHR.load(
             {
                 'url': '../api/1/categories/products',
                 'callbacks': {
                     'load': callback,
-                    'error': OnShop.functions.xhrError
+                    'error': onShop.functions.xhrError
                 }
             }
         );
@@ -208,15 +211,15 @@ OnShop.admin = function () {
         var check = window.confirm('Are you sure you want to delete category ' + deleteID + '?');
         if (check === true) {
             var callback = function (r) {
-                OnShop.functions.showFeedback(r.target.responseText, 'notice');
+                onShop.functions.showFeedback(r.target.responseText, 'notice');
                 manageCategories();
                 };
-            OnShop.XHR.load({
+            onShop.XHR.load({
                 'method': 'DELETE',
                 'url': '../api/1/category/' + deleteID,
                 'callbacks': {
                     'load': callback,
-                    'error': OnShop.functions.xhrError
+                    'error': onShop.functions.xhrError
                 }
             });
         }
@@ -227,4 +230,4 @@ OnShop.admin = function () {
     };
 
 }();
-window.addEventListener('load', OnShop.admin.loaded);
+window.addEventListener('load', onShop.admin.loaded);

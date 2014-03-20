@@ -1,7 +1,7 @@
 // create a namespace for the JS, and ensure nothing is overwritten.
-var OnShop = OnShop || {};
+var onShop = onShop || {};
 
-OnShop.functions = function () {
+onShop.functions = function () {
     'use strict';
 
     var productsArray, s = {
@@ -54,7 +54,7 @@ OnShop.functions = function () {
             s.sideMenu.innerHTML = styleCategories(categories);
             showBasket();
         };
-        OnShop.XHR.load(
+        onShop.XHR.load(
             {
                 'url': 'api/1/categories/nonempty',
                 'callbacks': {
@@ -75,7 +75,7 @@ OnShop.functions = function () {
             productsArray = JSON.parse(r.target.responseText);
             s.dynamicArea.innerHTML = styleProducts(productsArray);
             s.dynamicArea.classList.remove('loading');
-            enableLiveSearch(productsArray);
+            enableLiveSearch();
             var categoryListener = function (e) {
                 if (parseInt(e.target.id))  {
                     filterProducts(productsArray, e.target.id, e.target.firstChild.textContent);
@@ -83,7 +83,7 @@ OnShop.functions = function () {
             };
             s.sideMenu.addEventListener('click', categoryListener);
         };
-        OnShop.XHR.load(
+        onShop.XHR.load(
             {
                 'url': 'api/1/products/',
                 'callbacks': {
@@ -114,13 +114,13 @@ OnShop.functions = function () {
                     if (!(productDescription.indexOf(string) >= 0 || productName.indexOf(string) >= 0)) {
                         misses++;
                     }
-                }
-                var productDOM = document.getElementById('product' + productsArray[i].PRODUCT_ID);
-                if (misses > 0) {
-                    productDOM.classList.add('vanish');
-                } else {
-                    productDOM.classList.remove('vanish');
-                    matches.push(product);
+                    var productDOM = document.getElementById('product' + productsArray[i].PRODUCT_ID);
+                    if (misses > 0) {
+                        productDOM.classList.add('vanish');
+                    } else {
+                        productDOM.classList.remove('vanish');
+                        matches.push(product);
+                    }
                 }
             }
             if (matches.length === 0) {
@@ -179,7 +179,7 @@ OnShop.functions = function () {
             fail = function (e) {xhrError(e);};
             change = amount;
         }
-        OnShop.XHR.load({
+        onShop.XHR.load({
             'accept': 'text/html',
             'data': {
                 'id': product.PRODUCT_ID,
@@ -279,7 +279,7 @@ OnShop.functions = function () {
                 interval.set(wrapFunction, 8000);
             } else {s.dynamicArea.innerHTML = '<p>Sorry, that product couldn\'t be retrieved.</p>';}
         };
-        OnShop.XHR.load(
+        onShop.XHR.load(
             {
                 'url': 'api/1/product/' + productID,
                 'callbacks': {
@@ -314,7 +314,7 @@ OnShop.functions = function () {
                 document.getElementById('addToBasket').disabled = false;
             }
         };
-        OnShop.XHR.load(
+        onShop.XHR.load(
             {
                 'url': 'api/1/product/' + productID + '/stock',
                 'callbacks': {
@@ -402,7 +402,7 @@ OnShop.functions = function () {
         };
         for (var i = basket.length - 1; i >= 0; i--) {
             var product = JSON.parse(basket[i]);
-            OnShop.XHR.load(
+            onShop.XHR.load(
                 {
                     'url': 'api/1/product/' + product.PRODUCT_ID,
                     'callbacks': {
@@ -449,7 +449,7 @@ OnShop.functions = function () {
         for (var i = productsArray.length - 1; i >= 0; i--) {
             var product = productsArray[i];
             formattedProducts += '<li id="product'+ product.PRODUCT_ID + '"><a href="' + product.PRODUCT_URL + '"' +
-                            'onclick="return OnShop.functions.showProduct(' + product.PRODUCT_ID + ');"' +
+                            'onclick="return onShop.functions.showProduct(' + product.PRODUCT_ID + ');"' +
                             '><h4 class="productName">' +
                             product.PRODUCT_NAME + '</h4>' +
                             '<img src="' + product.PRODUCT_IMAGE + '" alt="' +
@@ -478,4 +478,4 @@ OnShop.functions = function () {
     };
 }();
 
-window.addEventListener('load', OnShop.functions.pageLoaded);
+window.addEventListener('load', onShop.functions.pageLoaded);

@@ -83,7 +83,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	// variables from settings.
 
-	define("STORE_NAME","' . $storeName . '");';
+	define("STORE_NAME","' . $storeName . '");
+';
 	file_put_contents($file, $data);
 	$result = array('success' => True, 'message' => "Configuration file created.");
 	echo json_encode($result);

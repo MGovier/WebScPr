@@ -5,11 +5,11 @@ require_once("../inc/config.php");
     			<fieldset>
     				<p>
 		    			<label for="categoryName">Category Name:</label>
-		    			<input type="text" id="categoryName" name="categoryName" placeholder="Enter category name">
+		    			<input type="text" id="categoryName" name="categoryName" placeholder="Enter category name" required>
 	    			</p>
 	    			<p>
-	    				<label for="submit">Submit Category:</label>
-	    				<input type="submit" id="submit" name="submit" value="Submit!">
+	    				<label for="submitCat">Submit Category:</label>
+	    				<input type="submit" id="submitCat" name="submitCat" value="Submit!">
     				</p>
     			</fieldset>
 			</form>

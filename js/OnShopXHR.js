@@ -1,9 +1,9 @@
 // create a namespace for the JS, and ensure nothing is overwritten.
-var OnShop = OnShop || {};
+var onShop = onShop || {};
 
 // This XHR function is heavily based on Kit Lester & Rich Boakes' Linora project. 
 // Thanks!
-OnShop.XHR = function () {
+onShop.XHR = function () {
 	'use strict';
 
 	function encodePayload (data) {

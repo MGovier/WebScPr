@@ -5,7 +5,7 @@ require_once("../inc/config.php");
 $pageTitle = "Admin";
 $section = "adminhome";
 include(ROOT_PATH . 'inc/header.php'); ?>
-<script src="<?php echo BASE_URL; ?>admin/OnShopAdminScripts.js"></script>
+<script src="<?php echo BASE_URL; ?>admin/onShopAdminScripts.js"></script>
 
 <div class="container">
 <div id="feedback" class="vanish"></div>

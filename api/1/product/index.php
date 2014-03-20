@@ -42,14 +42,7 @@
 				echo 'Error! All fields are required.';
 				exit();
 			}
-			if (empty($_POST["adminToken"])) {
-				echo 'Error! No getting past my incredible security.';
-				exit();
-			} elseif ($_POST["adminToken"] !== "845689458465189121856489418946548479") {
-				echo 'Error! No getting past my incredible security.';
-				exit();
-			}
-
+			// Maybe a little paranoid about SQL injection...
 			$productName = $db->real_escape_string($_POST["productName"]);
 			$productCategory = $db->real_escape_string($_POST["productCategory"]);
 			$productDescription = $db->real_escape_string($_POST["productDescription"]);
