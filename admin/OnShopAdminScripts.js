@@ -56,34 +56,38 @@ onShop.admin = function () {
     function editItem (e) {
         var updateID = e.target.id;
         var stockBox = document.querySelector('#product' + updateID + ' .stock');
-        stockBox.innerHTML = '<input type="number" id="newStock" min="0" value="' + stockBox.innerHTML + '">';
+        // We can't use type="number" here, or else chrome ignores the possibilty of it being a string.
+        // Perhaps could use a form and then validate it, but how to split across multiple table cells?
+        stockBox.innerHTML = '<input id="newStock" min="0" value="' + stockBox.innerHTML + '">';
         var priceBox = document.querySelector('#product' + updateID + ' .price');
-        priceBox.innerHTML = '<input type="number" id="newPrice" min="0" value="' + priceBox.innerHTML + '">';
+        priceBox.innerHTML = '<input id="newPrice" min="0" value="' + priceBox.innerHTML + '">';
         var optionsBox = document.querySelector('#product' + updateID + ' .optionButtons');
         optionsBox.innerHTML = '<button id="doneEditing">Done</button>';
         var submit = function () {
             var stock = stockBox.firstChild.value;
             var price = priceBox.firstChild.value;
-            var callback = function (r) {
-                onShop.functions.showFeedback(r.target.responseText, 'notice');
-                priceBox.innerHTML = price;
-                stockBox.innerHTML = stock;
-                optionsBox.innerHTML = '<td class="optionButtons"><button class="editItem" id="' + updateID + '">Edit</button>' +'<button class="deleteItem" id="' + updateID + '">Remove</button></td>';
-                refreshFormListeners();
-                };
-            onShop.XHR.load({
-                'data': {
-                    'id': updateID,
-                    'stock': stock,
-                    'price': price
-                },
-                'method': 'PATCH',
-                'url': '../api/1/product/',
-                'callbacks': {
-                    'load': callback,
-                    'error': onShop.functions.xhrError
-                }
-            });
+            if (!(isNaN(stock) || isNaN(price))) {
+                var callback = function (r) {
+                    onShop.functions.showFeedback(r.target.responseText, 'notice');
+                    priceBox.innerHTML = price;
+                    stockBox.innerHTML = stock;
+                    optionsBox.innerHTML = '<td class="optionButtons"><button class="editItem" id="' + updateID + '">Edit</button>' +'<button class="deleteItem" id="' + updateID + '">Remove</button></td>';
+                    refreshFormListeners();
+                    };
+                onShop.XHR.load({
+                    'data': {
+                        'id': updateID,
+                        'stock': stock,
+                        'price': price
+                    },
+                    'method': 'PATCH',
+                    'url': '../api/1/product/',
+                    'callbacks': {
+                        'load': callback,
+                        'error': onShop.functions.xhrError
+                    }
+                });
+            } else onShop.functions.showFeedback('Numbers only, please!', 'notice');
         };
         var doneButton = document.querySelector('#product' + updateID + ' #doneEditing');
         doneButton.addEventListener('click', submit);
@@ -124,7 +128,7 @@ onShop.admin = function () {
             document.getElementById('dynamic-content').innerHTML = r.target.responseText;
             document.getElementById('submit').addEventListener('click', function (e) {
                 if (this.form.checkValidity()) {
-                    e.preventDefault()
+                    e.preventDefault();
                     sendForm(this.form);
                 }
             });
@@ -145,7 +149,7 @@ onShop.admin = function () {
             document.getElementById('dynamic-content').innerHTML = r.target.responseText;
             document.getElementById('submitCat').addEventListener('click', function (e) {
                 if (this.form.checkValidity()) {
-                    e.preventDefault()
+                    e.preventDefault();
                     sendForm(this.form);
                 }
             });
