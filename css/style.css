@@ -224,12 +224,12 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 
 #products .cost {
 	color: grey;
-	size: 2em;
+	font-size: 1em;
 	position: absolute;
 	bottom: 0;
 	padding: 0.2em;
 	margin: 0;
-	vertical-align: center;
+	vertical-align: middle;
 }
 
 #product {
@@ -240,7 +240,6 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 	max-height: 30em;
 	display: block;
 	float: left;
-	margin: 2.5;
 	padding: 1px;
 	border: 1px solid #e3e1e0;
 	border-radius: 0.1em;
@@ -332,9 +331,20 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 
 .vanish {
 	width: 0 !important;
-	opacity: 0;
+	margin: 0 !important;
+	border: 0 !important;
+	opacity: 0 !important;
 	height: 0 !important;
 	transition: all 0.3s 0.1s;
+}
+
+.flipOut {
+	animation-name: flipOut;
+	animation-duration: .8s;
+	animation-fill-mode: both;
+	-webkit-animation-name: flipOut;
+	-webkit-animation-duration: .8s;
+	-webkit-animation-fill-mode: both;
 }
 
 #feedback {
@@ -375,13 +385,11 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 @keyframes fadeInDown {
 	0% {
 		opacity: 0;
-		-webkit-transform: translateY(-2em);
 		transform: translateY(-2em);
 	}
 
 	100% {
 		opacity: 1;
-		-webkit-transform: translateY(0);
 		transform: translateY(0);
 	}
 }
@@ -403,6 +411,44 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 
 	100% {
 		opacity: 1;
+	}
+}
+
+@-webkit-keyframes flipOut {
+	0% {
+		-webkit-transform: perspective(20em) rotateY(0deg);
+		opacity: 1;
+	}
+
+	90% {
+		-webkit-transform: perspective(20em) rotateY(90deg);
+		opacity: 0;
+	}
+
+	100% {
+		width: 0;
+		margin: 0;
+		border: 0;
+		padding: 0;
+	}
+}
+
+@keyframes flipOut {
+	0% {
+		transform: perspective(20em) rotateY(0deg);
+		opacity: 1;
+	}
+
+	90% {
+		transform: perspective(20em) rotateY(90deg);
+		opacity: 0;
+	}
+
+	100% {
+		width: 0;
+		margin: 0;
+		border: 0;
+		padding: 0;
 	}
 }
 
@@ -432,5 +478,4 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 		padding: 0.4em;
 		margin: 0.4em auto;
 	}
-}
 }

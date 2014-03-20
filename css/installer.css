@@ -41,14 +41,23 @@ button {
 	transition: all .2s ease;
 }
 
+button a {
+	text-decoration: none;
+	color: snow;
+}
+
 form button:hover {
 	box-shadow: 0 0 0.8em #888;
 	transition: all 0.2s ease;
 }
 
 .slideOut {
-	animation: slideOut 0.8s;
-	-webkit-animation: slideOut 0.8s;
+	animation-name: slideOut;
+	animation-duration: .8s;
+	animation-fill-mode: both;
+	-webkit-animation-name: slideOut;
+	-webkit-animation-duration: .8s;
+	-webkit-animation-fill-mode: both;
 }
 
 .slideIn {

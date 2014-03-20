@@ -11,8 +11,9 @@ onShop.installation = function () {
 			if (this.form.checkValidity()) {
 				e.preventDefault();
 				sendForm1(this.form);
-				this.form.classList.remove('slideInFromLeft');
 				this.form.classList.add('slideOut', 'vanish');
+				this.form.classList.remove('slideInFromLeft');
+				stepStatus.classList.remove('slideInFromLeft');
 				stepStatus.classList.add('slideIn');
 				stepStatus.innerHTML = '<p>Ok, testing that out! Please wait...</p>';
 			}
@@ -50,8 +51,9 @@ onShop.installation = function () {
 				stage2(formData);
 			} else {
 				document.getElementById('step').innerHTML = '<p>Step 1: Blast, we got this error: ' + response.message + ' Please check the details.';
-				form.classList.remove('vanish', 'slideOut', 'slideIn');
+				form.classList.remove('slideOut', 'vanish');
 				form.classList.add('slideInFromLeft');
+				stepStatus.classList.add('slideInFromLeft');
 			}
 		};
 		var error = function () {
