@@ -173,8 +173,11 @@
 			} else {
 				echo 'Error! Could not prepare statement.';
 			}
-			chdir(ROOT_PATH);
-			unlink($pictureName);
+			// Better not delete the favicon!
+			if (strpos($pictureName, "favicon.png") < 0) {
+				chdir(ROOT_PATH);
+				unlink($pictureName);
+			}
 			break;
 
 		default:

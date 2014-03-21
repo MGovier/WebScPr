@@ -11,10 +11,12 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 <div id="feedback" class="vanish"></div>
 	<div id="side-options">
 		<ul id="options">
-			<li id="stockLevels">Manage items</li>
-			<li id="productAddFormToggle">Add an item</li>
-			<li id="manageCategories">Manage categories</li>
-			<li id="addCategoryToggle">Add a category</li>
+			<li id="stockLevels">Manage Items</li>
+			<li id="productAddFormToggle">Add an Item</li>
+			<li id="manageCategories">Manage Categories</li>
+			<li id="addCategoryToggle">Add a Category</li>
+			<li id="viewOrders">View Orders</li>
+			<li id="viewStats">View Statistics</li>
 		</ul>
 	</div>
 		<h3 id="feature-title">Admin Control</h3>

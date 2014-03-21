@@ -368,6 +368,13 @@ body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
 	line-height: 0em;
 }
 
+#upload-progress {
+	margin: 0 auto;
+	margin-top: 2em;
+	width: 60%;
+	display: block;
+}
+
 /*Animations*/
 
 @-webkit-keyframes fadeInDown {

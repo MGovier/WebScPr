@@ -56,7 +56,7 @@ onShop.admin = function () {
     function editItem (e) {
         var updateID = e.target.id;
         var stockBox = document.querySelector('#product' + updateID + ' .stock');
-        // We can't use type="number" here, or else chrome ignores the possibilty of it being a string.
+        // We can't use type="number" here, or else chrome ignores the possibility of it being a string.
         // Perhaps could use a form and then validate it, but how to split across multiple table cells?
         stockBox.innerHTML = '<input id="newStock" min="0" value="' + stockBox.innerHTML + '">';
         var priceBox = document.querySelector('#product' + updateID + ' .price');
@@ -124,14 +124,40 @@ onShop.admin = function () {
     }
 
     function showAddForm () {
-        var callback = function (r) {
-            document.getElementById('dynamic-content').innerHTML = r.target.responseText;
-            document.getElementById('submit').addEventListener('click', function (e) {
-                if (this.form.checkValidity()) {
-                    e.preventDefault();
-                    sendForm(this.form);
+        var progressBar, callback = function (r) {
+            var loadCallback = function (r) {
+                onShop.functions.showFeedback(r.target.responseText, 'notice');
+                document.getElementById('addProductForm').reset();
+                progressBar.value = 0;
+                progressBar.classList.add('vanish');
+            };
+            var progressListener = function (e) {
+                if (e.lengthComputable) {
+                    var percent = Math.round(e.loaded * 100 / e.total);
+                    progressBar.value = percent;
+                    console.log(percent);
                 }
-            });
+            };
+            var sendListener = function (e) {
+                if (this.form.checkValidity()) {
+                    progressBar = document.getElementById('upload-progress');
+                    e.preventDefault();
+                    var formData = new FormData(this.form);
+                    onShop.XHR.load({
+                            'method': 'POST',
+                            'url': this.form.action,
+                            'data': formData,
+                            'callbacks': {
+                                'load': loadCallback,
+                                'progress': progressListener,
+                                'error': onShop.functions.xhrError
+                            }
+                        });
+                    progressBar.classList.remove('vanish');
+                }
+            };
+            document.getElementById('dynamic-content').innerHTML = r.target.responseText;
+            document.getElementById('submit').addEventListener('click', sendListener);
         };
         onShop.XHR.load(
             {
@@ -146,13 +172,18 @@ onShop.admin = function () {
 
     function showAddCategoryForm () {
         var callback = function (r) {
-            document.getElementById('dynamic-content').innerHTML = r.target.responseText;
-            document.getElementById('submitCat').addEventListener('click', function (e) {
+            var loadCallback = function (r) {
+                onShop.functions.showFeedback(r.target.responseText, 'notice');
+                document.getElementById('categoryName').value = '';
+            };
+            var sendListener = function (e) {
                 if (this.form.checkValidity()) {
                     e.preventDefault();
-                    sendForm(this.form);
+                    sendForm(this.form, loadCallback);
                 }
-            });
+            };
+            document.getElementById('dynamic-content').innerHTML = r.target.responseText;
+            document.getElementById('submitCat').addEventListener('click', sendListener);
         };
         onShop.XHR.load(
             {
@@ -165,11 +196,8 @@ onShop.admin = function () {
         );
     }
 
-    var sendForm = function (form) {
+    var sendForm = function (form, callback, progress) {
         var formData = new FormData(form);
-        var callback = function (r) {
-            onShop.functions.showFeedback(r.target.responseText, 'notice');
-        };
         onShop.XHR.load(
             {
                 'method': 'POST',
@@ -177,6 +205,7 @@ onShop.admin = function () {
                 'data': formData,
                 'callbacks': {
                     'load': callback,
+                    'progress': progress,
                     'error': onShop.functions.xhrError
                 }
             }
@@ -184,7 +213,7 @@ onShop.admin = function () {
     };
 
     function manageCategories () {
-        var tableHTML = '<table class="productTable" id="categoriesTable"><caption>Categories (please note, only empty categories may be removed)</caption><thead><tr><th>Category ID</th><th>Category Name</th><th>Items in Category</th><th>Update</th></tr></thead>';
+        var tableHTML = '<table class="productTable" id="categoriesTable"><caption>Categories (only empty categories may be removed)</caption><thead><tr><th>Category ID</th><th>Category Name</th><th>Items in Category</th><th>Update</th></tr></thead>';
         var callback = function (r) {
             var categories = JSON.parse(r.target.responseText);
             for (var i = 0; i < categories.length; i++) {
