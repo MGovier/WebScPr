@@ -36,7 +36,6 @@
 		case 'POST':
 			if (empty($_POST["productName"]) 
 				|| empty($_POST["productCategory"]) 
-				|| empty($_POST["productDescription"]) 
 				|| empty($_POST["productStock"]) 
 				|| empty($_POST["productPrice"])) {
 				echo 'Error! All fields are required.';
@@ -73,7 +72,6 @@
 		    } else {
 				$file = $_FILES['productImage'];
 				$path = $file['name'];
-				echo $path;
 				$fileExtension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
 				$allowedExtensions = array("jpg", "jpeg", "png", "webp", "bmp", "gif", "svg");
 				if (!(in_array($fileExtension, $allowedExtensions))) {
@@ -173,8 +171,8 @@
 			} else {
 				echo 'Error! Could not prepare statement.';
 			}
-			// Better not delete the favicon!
-			if (strpos($pictureName, "favicon.png") < 0) {
+			// Better not delete the assets!
+			if (!(strpos($pictureName, "assets") || strpos($pictureName, "demo"))) {
 				chdir(ROOT_PATH);
 				unlink($pictureName);
 			}

@@ -135,7 +135,6 @@ onShop.admin = function () {
                 if (e.lengthComputable) {
                     var percent = Math.round(e.loaded * 100 / e.total);
                     progressBar.value = percent;
-                    console.log(percent);
                 }
             };
             var sendListener = function (e) {
