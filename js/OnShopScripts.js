@@ -224,7 +224,7 @@ onShop.functions = function () {
                 localStorage.BASKET = JSON.stringify(newBasket);
                 showBasket();
                 manageBasket();
-                // heartbeat? oh man.
+                // It would be nice to send a "heartbeat" from the client basket to monitor activity.
             }
         };
         s.dynamicArea.innerHTML = styleBasketTable(basket);

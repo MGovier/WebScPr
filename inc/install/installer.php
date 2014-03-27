@@ -33,28 +33,30 @@
 		<div id="step">
 			<p>Step 1 of 2: Let's try and connect to your MySQL database.</p>
 		</div>
-		<form id="step1" method="POST" action="inc/db/">
-			<fieldset name="core" id="core">
-				<label for="dbAddress">Database IP:</label>
-				<input type="text" id="dbAddress" name="dbAddress" pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$" value="127.0.0.1">
-				<label for="dbPort">Database Port:</label>
-				<input type="text" id="dbPort" name="dbPort" pattern="^[0-9]+$" value="3306">
-				<label for="dbUser">Database Username:</label>
-				<input type="text" id="dbUser" name="dbUser" value="root">
-				<label for="dbPass">Database Password:</label>
-				<input type="password" id="dbPass" name="dbPass">
-			</fieldset>
-			<button id="step1submit" type="submit">Let's go!</button>
-		</form>
-		<form id="step2" class="vanish" method="POST" action="inc/install/install.php">
-			<fieldset name="settings">
-				<label for="storeName">Store Name:</label>
-				<input type="text" id="storeName" name="storeName" required>
-				<label for="dbDemo">Install with demo items?</label>
-				<input type="checkbox" id="dbDemo" name="dbDemo">	
-			</fieldset>
-			<button id="step2submit" type="submit">Submit!</button>
-		</form>
+		<div class="forms">
+			<form id="step1" method="POST" action="inc/db/">
+				<fieldset name="core" id="core">
+					<label for="dbAddress">Database IP:</label>
+					<input type="text" id="dbAddress" name="dbAddress" pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$" value="127.0.0.1">
+					<label for="dbPort">Database Port:</label>
+					<input type="text" id="dbPort" name="dbPort" pattern="^[0-9]+$" value="3306">
+					<label for="dbUser">Database Username:</label>
+					<input type="text" id="dbUser" name="dbUser" value="root">
+					<label for="dbPass">Database Password:</label>
+					<input type="password" id="dbPass" name="dbPass">
+				</fieldset>
+				<button id="step1submit" type="submit">Let's go!</button>
+			</form>
+			<form id="step2" class="vanish" method="POST" action="inc/install/install.php">
+				<fieldset name="settings">
+					<label for="storeName">Store Name:</label>
+					<input type="text" id="storeName" name="storeName" required>
+					<label for="dbDemo">Install with demo items?</label>
+					<input type="checkbox" id="dbDemo" name="dbDemo">	
+				</fieldset>
+				<button id="step2submit" type="submit">Submit!</button>
+			</form>
+		</div>
 </div>
 </div> 
 	<div class="footer">

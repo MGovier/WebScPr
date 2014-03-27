@@ -11,7 +11,8 @@ onShop.installation = function () {
 			if (this.form.checkValidity()) {
 				e.preventDefault();
 				sendForm1(this.form);
-				this.form.classList.add('slideOut', 'vanish');
+				this.form.classList.add('slideOut');
+				this.form.classList.add('vanish');
 				this.form.classList.remove('slideInFromLeft');
 				stepStatus.classList.remove('slideInFromLeft');
 				stepStatus.classList.add('slideIn');
