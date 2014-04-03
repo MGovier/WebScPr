@@ -212,51 +212,55 @@ onShop.functions = function () {
     }
 
     function manageBasket () {
-        addBackButton();
-        disableLiveSearch();
-        var basket = JSON.parse(localStorage.BASKET);
-        interval.unsetAll();
-        window.history.pushState(null, 'My Basket', 'basket.php');
-        var deleteItem = function (e) {
-            if (e.target.type == 'submit' && parseInt(e.target.parentNode.parentNode.id)) {
-                var basket = JSON.parse(localStorage.BASKET);
-                var newBasket = [];
-                for (var i = basket.length - 1; i >= 0; i--) {
-                    var item = JSON.parse(basket[i]);
-                    if (item.PRODUCT_ID != e.target.parentNode.parentNode.id) {
-                        newBasket.push(JSON.stringify(item));
-                    } else {
-                        changeStock(item, item.PRODUCT_QUANTITY, false);
+        if (localStorage.BASKET) {
+            addBackButton();
+            disableLiveSearch();
+            interval.unsetAll();
+            window.history.pushState(null, 'My Basket', 'basket.php');
+            var deleteItem = function (e) {
+                if (e.target.type == 'submit' && parseInt(e.target.parentNode.parentNode.id)) {
+                    var basket = JSON.parse(localStorage.BASKET);
+                    var newBasket = [];
+                    for (var i = basket.length - 1; i >= 0; i--) {
+                        var item = JSON.parse(basket[i]);
+                        if (item.PRODUCT_ID != e.target.parentNode.parentNode.id) {
+                            newBasket.push(JSON.stringify(item));
+                        } else {
+                            changeStock(item, item.PRODUCT_QUANTITY, false);
+                        }
+                    }
+                    localStorage.BASKET = JSON.stringify(newBasket);
+                    showBasket();
+                    manageBasket();
+                    // It would be nice to send a "heartbeat" from the client basket to monitor activity.
+                }
+            };
+            var basket = JSON.parse(localStorage.BASKET);
+            s.dynamicArea.innerHTML = styleBasketTable(basket);
+            s.featureTitle.innerHTML = 'My Basket';
+            // The event listener is in the AJAX return call to avoid losing the event listener on DOM change.
+            var loadForm = function (r) {
+                s.dynamicArea.innerHTML += '<hr>' + r.target.responseText;
+                var table = document.getElementById('basketTable');
+                table.addEventListener('click', deleteItem);
+                var sendOrder = function (e) {
+                    e.preventDefault();
+                    if (e.target.checkValidity()) {submitOrder(e.target);}
+                };
+                document.getElementById('orderForm').addEventListener('submit', sendOrder);
+            };
+            onShop.XHR.load(
+                {
+                    'url': 'inc/orderform.php',
+                    'callbacks': {
+                        'load': loadForm,
+                        'error': xhrError
                     }
                 }
-                localStorage.BASKET = JSON.stringify(newBasket);
-                showBasket();
-                manageBasket();
-                // It would be nice to send a "heartbeat" from the client basket to monitor activity.
-            }
-        };
-        s.dynamicArea.innerHTML = styleBasketTable(basket);
-        s.featureTitle.innerHTML = 'My Basket';
-        // The event listener is in the AJAX return call to avoid losing the event listener on DOM change.
-        var loadForm = function (r) {
-            s.dynamicArea.innerHTML += '<hr>' + r.target.responseText;
-            var table = document.getElementById('basketTable');
-            table.addEventListener('click', deleteItem);
-            var sendOrder = function (e) {
-                e.preventDefault();
-                if (e.target.checkValidity()) {submitOrder(e.target);}
-            };
-            document.getElementById('orderForm').addEventListener('submit', sendOrder);
-        };
-        onShop.XHR.load(
-            {
-                'url': 'inc/orderform.php',
-                'callbacks': {
-                    'load': loadForm,
-                    'error': xhrError
-                }
-            }
-        );
+            );
+        } else {
+            s.dynamicArea.innerHTML = '<a href="index.php"><button>Nothing here! Let\'s look at some products...</button>';
+        }
     }
 
 
@@ -348,15 +352,13 @@ onShop.functions = function () {
                 document.getElementById('addToBasket').disabled = false;
             }
         };
-        onShop.XHR.load(
-            {
-                'url': 'api/1/product/' + productID + '/stock',
-                'callbacks': {
-                    'load': updateStock,
-                    'error': xhrError
-                }
+        onShop.XHR.load({
+            'url': 'api/1/product/' + productID + '/stock',
+            'callbacks': {
+                'load': updateStock,
+                'error': xhrError
             }
-        );
+        });
     }
 
     function addToBasket (product, quantity) {
@@ -390,7 +392,22 @@ onShop.functions = function () {
 
     function submitOrder (form) {
         var formData = new FormData(form);
-        console.log("what what");
+        formData.append('customer-order', localStorage.BASKET);
+        var callback = function (r) {
+            showFeedback(r.target.responseText);
+            localStorage.removeItem('BASKET');
+            showBasket();
+            manageBasket();
+        };
+        onShop.XHR.load({
+            'method': 'POST',
+            'url': form.action,
+            'data': formData,
+            'callbacks': {
+                'load': callback,
+                'error': xhrError
+            }
+        });
     }
 
     /******************************* 

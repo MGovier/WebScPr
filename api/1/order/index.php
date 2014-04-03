@@ -11,12 +11,9 @@
 				echo 'Error! All fields are required.';
 				exit();
 			}
-			$cName = $db->real_escape_string($_POST["customer-name"]);
-			$cAddress = $db->real_escape_string($_POST["customer-address"]);
-			$cOrder = $db->real_escape_string($_POST["customer-order"]);
 			$query = $db->stmt_init();
 			if ($query->prepare("INSERT INTO ORDERS VALUES (NULL, NOW(), ?, ?, ?, 1)")) {
-				$query->bind_param("sss", $cName, $cAddress, $cOrder);
+				$query->bind_param("sss", $_POST["customer-name"], $_POST["customer-address"], $_POST["customer-order"]);
 				$query->execute();
 				echo "Order successful!";
 			} else {
