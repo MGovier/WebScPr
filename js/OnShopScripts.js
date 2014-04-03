@@ -160,12 +160,11 @@ onShop.functions = function () {
     };
 
     function showBasket () {
-        var basket = localStorage.BASKET;
-        if (basket) {
-            var items = JSON.parse(basket);
+        if (localStorage.BASKET) {
+            var items = JSON.parse(localStorage.BASKET);
             s.basket.innerHTML = styleBasket(items);
             s.basket.addEventListener('click', manageBasket);
-        }
+        } else s.basket.innerHTML = '<li><p>No Products in Basket.</p><p>Why not buy some stuff?!</p></li>';
     }
 
     function changeStock (product, amount, add) {
