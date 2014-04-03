@@ -1,8 +1,16 @@
 @import url("normalize.css");
 @import url(http://fonts.googleapis.com/css?family=Lato);
 
-html {overflow-y: scroll; overflow-x: hidden;}
-body {font-family: 'Lato', sans-serif; background:#f0eeed; color: #676767;}
+html {
+	overflow-y: scroll; 
+	overflow-x: hidden;
+}
+
+body {
+	font-family: 'Lato', sans-serif;
+	background: #f0eeed;
+	color: #676767;
+}
 
 .container {
 	width: 98%;
