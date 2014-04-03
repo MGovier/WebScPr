@@ -1,7 +1,7 @@
 <?php
 require_once("../inc/config.php");
 ?>
-	<form class="adminForm" name="addCategoryForm" action="<?php echo BASE_URL; ?>api/1/category/" >
+	<form class="adminForm" name="addCategoryForm" id="addCategoryForm" action="<?php echo BASE_URL; ?>api/1/category/" >
     			<fieldset>
     				<p>
 		    			<label for="categoryName">Category Name:</label>

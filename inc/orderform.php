@@ -248,7 +248,7 @@
 							<option value="Uzbekistan">Uzbekistan</option> 
 							<option value="Vanuatu">Vanuatu</option> 
 							<option value="Venezuela">Venezuela</option> 
-							<option value="Viet Nam">Viet Nam</option> 
+							<option value="Vietnam">Vietnam</option> 
 							<option value="Virgin Islands, British">Virgin Islands, British</option> 
 							<option value="Virgin Islands, U.S.">Virgin Islands, U.S.</option> 
 							<option value="Wallis and Futuna">Wallis and Futuna</option> 
@@ -260,11 +260,11 @@
 	    			</p>
 	    			<p>
 		    			<label>Payment details:</label>
-		    			An external service such as PayPal could be used here to manage transactions securely.
+		    			An external service such as PayPal or any number of merchant services could be used here to manage transactions securely.
 	    			</p>
 	    			<p>
-		    			<label for="remember-me">Remember these details? <em>Don't use this on public computers!</em></label>
-		    			<input name="remember-me" type="checkbox"/>
+		    			<label for="remember-me">Remember these details?</label>
+		    			<input name="remember-me" type="checkbox"/><em> Don't use this on public computers!</em>
 	    			</p>
 	    			<p>
 	    				<label for="submit">All done? </label>

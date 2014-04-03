@@ -138,13 +138,13 @@ onShop.admin = function () {
                 }
             };
             var sendListener = function (e) {
-                if (this.form.checkValidity()) {
+                if (e.target.checkValidity()) {
                     progressBar = document.getElementById('upload-progress');
                     e.preventDefault();
-                    var formData = new FormData(this.form);
+                    var formData = new FormData(e.target);
                     onShop.XHR.load({
                             'method': 'POST',
-                            'url': this.form.action,
+                            'url': e.target.action,
                             'data': formData,
                             'callbacks': {
                                 'load': loadCallback,
@@ -156,7 +156,7 @@ onShop.admin = function () {
                 }
             };
             document.getElementById('dynamic-content').innerHTML = r.target.responseText;
-            document.getElementById('submit').addEventListener('click', sendListener);
+            document.getElementById('addProductForm').addEventListener('submit', sendListener);
         };
         onShop.XHR.load(
             {
@@ -176,13 +176,13 @@ onShop.admin = function () {
                 document.getElementById('categoryName').value = '';
             };
             var sendListener = function (e) {
-                if (this.form.checkValidity()) {
+                if (e.target.checkValidity()) {
                     e.preventDefault();
-                    sendForm(this.form, loadCallback);
+                    sendForm(e.target, loadCallback);
                 }
             };
             document.getElementById('dynamic-content').innerHTML = r.target.responseText;
-            document.getElementById('submitCat').addEventListener('click', sendListener);
+            document.getElementById('addCategoryForm').addEventListener('submit', sendListener);
         };
         onShop.XHR.load(
             {

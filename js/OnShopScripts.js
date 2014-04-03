@@ -242,6 +242,11 @@ onShop.functions = function () {
             s.dynamicArea.innerHTML += '<hr>' + r.target.responseText;
             var table = document.getElementById('basketTable');
             table.addEventListener('click', deleteItem);
+            var sendOrder = function (e) {
+                e.preventDefault();
+                if (e.target.checkValidity()) {submitOrder(e.target);}
+            };
+            document.getElementById('orderForm').addEventListener('submit', sendOrder);
         };
         onShop.XHR.load(
             {
@@ -381,6 +386,11 @@ onShop.functions = function () {
         showBasket();
         showFeedback('Product added to basket!', 'notice');
         
+    }
+
+    function submitOrder (form) {
+        var formData = new FormData(form);
+        console.log("what what");
     }
 
     /******************************* 

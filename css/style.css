@@ -286,6 +286,15 @@ body {
 	padding: 0.5em;
 }
 
+/*I can't decide if I like this...
+.productTable tr:nth-child(even) {
+	background: snow;
+}*/
+
+.productTable tr:hover {
+	background: snow;
+}
+
 .productTable input {
 	width: 6em;
 	margin: 0 auto;
@@ -293,6 +302,10 @@ body {
 	border: 1px solid red;
 	box-shadow: 0 8px 8px -8px black;
 	animation: fadeInDown 0.2s;
+}
+
+.productTable th {
+	background: WhiteSmoke;
 }
 
 .hidden {
@@ -382,6 +395,24 @@ body {
 	margin-top: 2em;
 	width: 60%;
 	display: block;
+}
+
+#orderForm {
+	background: snow;
+}
+
+#orderForm label {
+	display: inline-block;
+	text-align: right;
+	width: 15%;
+	max-width: 20%;
+	padding: 0.2em;
+	color: black;
+}
+
+#orderForm input, textarea {
+	width: auto;
+	padding: 0.2em;
 }
 
 /*Animations*/
