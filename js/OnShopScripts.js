@@ -161,9 +161,9 @@ onShop.functions = function () {
         }
     }
 
-    function changeStock (product, amount, direction) {
+    function changeStock (product, amount, add) {
         var change, callback, fail;
-        if (direction === 'add') {
+        if (add) {
             callback = function (r) {
                 if (r.target.status == '200') {
                     addToBasket(product, amount);
@@ -174,7 +174,7 @@ onShop.functions = function () {
                 showFeedback('Error with stock levels. Please reload.');
             };
             change = -amount;
-        } else if (direction === 'remove') {
+        } else {
             callback = function () {};
             fail = function (e) {xhrError(e);};
             change = amount;
@@ -210,7 +210,7 @@ onShop.functions = function () {
         interval.unsetAll();
         window.history.pushState(null, 'My Basket', 'basket.php');
         var deleteItem = function (e) {
-            if (parseInt(e.target.parentNode.parentNode.id)) {
+            if (e.target.type == 'submit' && parseInt(e.target.parentNode.parentNode.id)) {
                 var basket = JSON.parse(localStorage.BASKET);
                 var newBasket = [];
                 for (var i = basket.length - 1; i >= 0; i--) {
@@ -218,7 +218,7 @@ onShop.functions = function () {
                     if (item.PRODUCT_ID != e.target.parentNode.parentNode.id) {
                         newBasket.push(JSON.stringify(item));
                     } else {
-                        changeStock(item, item.PRODUCT_QUANTITY, 'remove');
+                        changeStock(item, item.PRODUCT_QUANTITY, false);
                     }
                 }
                 localStorage.BASKET = JSON.stringify(newBasket);
@@ -270,7 +270,7 @@ onShop.functions = function () {
         showBasket();
         var addToBasketListener = function (product) {
             var quantity = document.getElementById('quantity').value;
-            changeStock(product, quantity, 'add');
+            changeStock(product, quantity, true);
         };
         var callback = function (r) {
             if (typeof r.target.responseText !== 'number') {
@@ -401,11 +401,11 @@ onShop.functions = function () {
     function styleBasketTable (basket) {
         var returnString = '<table class="productTable" id="basketTable"><caption>Summary</caption><thead><tr><th>Product Name</th><th>Product Thumbnail</th><th>Product Price</th><th>Product Quantity</th><th>Quantity Cost</th><th class="update">Update</th></tr></thead><tbody id="basketTableBody"></tbody></table>';
         var loadProduct = function (r, args) {
-            if (typeof response == 'number') {document.getElementById('basketTableBody').innerHTML += '<tr id="' + args.pid +'"><td colspan="5">Sorry, item ' + product.PRODUCT_ID + ' could not be found, it may have been removed!</td><td><button class="removeItem">Remove</button></td></tr>';}
+            if (r.target.status == 204) {document.getElementById('basketTableBody').innerHTML += '<tr id="' + args.pid +'"><td colspan="5">Sorry, item ' + args.pid + ' could not be found. It may have been removed.</td><td><button class="removeItem">Remove</button></td></tr>';}
             else {
                 var productDetails = JSON.parse(r.target.responseText);
                 var quantityCost = productDetails.PRODUCT_PRICE * args.quantity;
-                document.getElementById('basketTableBody').innerHTML += '<tr id="' + args.pid +'"><td>' + productDetails.PRODUCT_NAME + '</td><td class="thumbnail"><img src="' + productDetails.PRODUCT_IMAGE + '" alt="' + productDetails.PRODUCT_NAME + '">' + '<td>' + productDetails.PRODUCT_PRICE + '</td><td>'+ args.quantity + '</td><td>'+ quantityCost.toFixed(2) + '</td><td><button class="removeItem">Remove</button></td></tr>';
+                document.getElementById('basketTableBody').innerHTML += '<tr id="' + args.pid +'"><td><a href="product.php?id=' + args.pid + '">' + productDetails.PRODUCT_NAME + '</a></td><td class="thumbnail"><img src="' + productDetails.PRODUCT_IMAGE + '" alt="' + productDetails.PRODUCT_NAME + '">' + '<td>' + productDetails.PRODUCT_PRICE + '</td><td>'+ args.quantity + '</td><td>'+ quantityCost.toFixed(2) + '</td><td><button class="removeItem">Remove</button></td></tr>';
             }
         };
         for (var i = basket.length - 1; i >= 0; i--) {
