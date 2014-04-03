@@ -7,6 +7,7 @@ RewriteRule ^(.*)/api/1/category/([0-9]+)$ $1/api/1/category/index.php?id=$2 [L]
 RewriteRule ^(.*)/api/1/categories/nonempty$ $1/api/1/categories/index.php?empty=false [L]
 RewriteRule ^(.*)/api/1/categories/products$ $1/api/1/categories/index.php?count=products [L]
 RewriteRule ^(.*)/api/1/products/([A-Za-z]+)$ $1/api/1/products/index.php?sort=$2 [L]
+RewriteRule ^(.*)/api/1/order/([A-Za-z]+)$ $1/api/1/order/index.php?id=$2 [L]
 
 #Redirect if installed in root.
 RewriteRule ^api/1/product/([0-9]+)/stock$ api/1/product/index.php?id=$1&query=stock [L]
@@ -16,3 +17,4 @@ RewriteRule ^api/1/categories/nonempty$ api/1/categories/index.php?empty=false [
 RewriteRule ^api/1/categories/products$ api/1/categories/index.php?count=products [L]
 RewriteRule ^api/1/products/([A-Za-z]+)$ api/1/products/index.php?sort=$1 [L]
 RewriteRule ^product/([0-9]+)$ product/index.php?id=$1 [L]
+RewriteRule ^api/1/order/([A-Za-z]+)$ api/1/order/index.php?id=$1 [L]

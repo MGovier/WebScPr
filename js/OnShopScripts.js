@@ -33,6 +33,7 @@ onShop.functions = function () {
             // do nothing.
         } else if (document.URL.indexOf('basket') > -1) {
             manageBasket();
+            showBasket();
         }
         else {
             var gets = window.location.search;
@@ -75,7 +76,7 @@ onShop.functions = function () {
             productsArray = JSON.parse(r.target.responseText);
             s.dynamicArea.innerHTML = styleProducts(productsArray);
             s.dynamicArea.classList.remove('loading');
-            liveSearch(productsArray);
+            enableLiveSearch(productsArray);
             var categoryListener = function (e) {
                 if (parseInt(e.target.id))  {
                     filterProducts(e.target.id, e.target.firstChild.textContent);
@@ -95,8 +96,9 @@ onShop.functions = function () {
 
     }
 
-    function liveSearch () {
+    function enableLiveSearch () {
         var searchBox = document.getElementById('search');
+        searchBox.disabled = false;
         // Prevent submitting the search form.
         searchBox.addEventListener('keydown', function (e) {
             if (e.keyCode == '13') {e.preventDefault();}
@@ -127,6 +129,11 @@ onShop.functions = function () {
                 showFeedback('Sorry, no matching products!', 'notice');
             }
         });
+    }
+
+    function disableLiveSearch () {
+        var searchBox = document.getElementById('search');
+        searchBox.disabled = true;
     }
 
     var interval = {
@@ -206,6 +213,7 @@ onShop.functions = function () {
 
     function manageBasket () {
         addBackButton();
+        disableLiveSearch();
         var basket = JSON.parse(localStorage.BASKET);
         interval.unsetAll();
         window.history.pushState(null, 'My Basket', 'basket.php');
@@ -229,8 +237,21 @@ onShop.functions = function () {
         };
         s.dynamicArea.innerHTML = styleBasketTable(basket);
         s.featureTitle.innerHTML = 'My Basket';
-        var target = document.getElementById('basketTable');
-        target.addEventListener('click', deleteItem);
+        // The event listener is in the AJAX return call to avoid losing the event listener on DOM change.
+        var loadForm = function (r) {
+            s.dynamicArea.innerHTML += '<hr>' + r.target.responseText;
+            var table = document.getElementById('basketTable');
+            table.addEventListener('click', deleteItem);
+        };
+        onShop.XHR.load(
+            {
+                'url': 'inc/orderform.php',
+                'callbacks': {
+                    'load': loadForm,
+                    'error': xhrError
+                }
+            }
+        );
     }
 
 
