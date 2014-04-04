@@ -76,17 +76,19 @@ onShop.functions = function () {
             productsArray = JSON.parse(r.target.responseText);
             s.dynamicArea.innerHTML = styleProducts(productsArray);
             var productButtons = document.querySelectorAll('#products li');
+            // Very hacky way of extracting product numbers.
             var loadProduct = function (e) {
                 e.preventDefault();
-                if (!parseInt(e.target.parentNode.id)) {
-                    showProduct(e.target.parentNode.parentNode.id);
-                } else showProduct(e.target.parentNode.id);
+                var id = e.target.parentNode.id.replace('product', '');
+                if (!parseInt(id)) {
+                    showProduct(e.target.parentNode.parentNode.id.replace('product', ''));
+                } else showProduct(id);
             };
             for (var i = 0; i < productButtons.length; i++) {
                 productButtons[i].addEventListener('click', loadProduct);
             }
             s.dynamicArea.classList.remove('loading');
-            enableLiveSearch(productsArray);
+            enableLiveSearch();
             var categoryListener = function (e) {
                 if (parseInt(e.target.id))  {
                     filterProducts(e.target.id, e.target.firstChild.textContent);
@@ -517,7 +519,7 @@ onShop.functions = function () {
         var formattedProducts = '<ul id="products">';
         for (var i = productsArray.length - 1; i >= 0; i--) {
             var product = productsArray[i];
-            formattedProducts += '<li id="' + product.PRODUCT_ID + '"><a href="' + product.PRODUCT_URL + '"' +
+            formattedProducts += '<li id="product' + product.PRODUCT_ID + '"><a href="' + product.PRODUCT_URL + '"' +
                             '><h4 class="productName">' +
                             product.PRODUCT_NAME + '</h4>' +
                             '<img src="' + product.PRODUCT_IMAGE + '" alt="' +
