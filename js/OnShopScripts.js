@@ -254,9 +254,14 @@ onShop.functions = function () {
                 s.dynamicArea.innerHTML += '<hr>' + r.target.responseText;
                 var table = document.getElementById('basketTable');
                 table.addEventListener('click', deleteItem);
+                if (basketArray.length < 1) {
+                    document.querySelector('#orderForm #submit').disabled = true;
+                }
                 var sendOrder = function (e) {
                     e.preventDefault();
-                    if (e.target.checkValidity()) {submitOrder(e.target);}
+                    if (e.target.checkValidity()) {
+                        submitOrder(e.target);
+                    }
                 };
                 document.getElementById('orderForm').addEventListener('submit', sendOrder);
             };

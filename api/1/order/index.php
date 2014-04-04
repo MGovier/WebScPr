@@ -13,9 +13,10 @@
 				header ("HTTP/1.1 400 Bad Request");
 				exit();
 			}
+			$cAddress = $_POST["customer-address"] . ". \r\n" . $_POST["customer-country"];
 			$query = $db->stmt_init();
 			if ($query->prepare("INSERT INTO ORDERS VALUES (NULL, NOW(), ?, ?, ?, ?, 1)")) {
-				$query->bind_param("ssss", $_POST["customer-name"], $_POST["customer-address"], $_POST["customer-email"], $_POST["customer-order"]);
+				$query->bind_param("ssss", $_POST["customer-name"], $cAddress, $_POST["customer-email"], $_POST["customer-order"]);
 				$query->execute();
 				echo "Order successful!";
 			} else {
