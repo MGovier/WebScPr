@@ -259,6 +259,10 @@
 						</select>
 	    			</p>
 	    			<p>
+		    			<label for="email-address">Email address:</label>
+		    			<input name="remember-me" type="email" required />
+	    			</p>
+	    			<p>
 		    			<label>Payment details:</label>
 		    			An external service such as PayPal or any number of merchant services could be used here to manage transactions securely.
 	    			</p>

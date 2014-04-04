@@ -237,7 +237,7 @@ onShop.functions = function () {
             var basket = JSON.parse(localStorage.BASKET);
             s.dynamicArea.innerHTML = styleBasketTable(basket);
             s.featureTitle.innerHTML = 'My Basket';
-            // The event listener is in the AJAX return call to avoid losing the event listener on DOM change.
+            // The event listener is in the AJAX return call to avoid loss on DOM change.
             var loadForm = function (r) {
                 s.dynamicArea.innerHTML += '<hr>' + r.target.responseText;
                 var table = document.getElementById('basketTable');
@@ -396,7 +396,7 @@ onShop.functions = function () {
             showFeedback(r.target.responseText);
             localStorage.removeItem('BASKET');
             showBasket();
-            manageBasket();
+            styleOrderSuccess();
         };
         onShop.XHR.load({
             'method': 'POST',
@@ -523,6 +523,11 @@ onShop.functions = function () {
                                     '">'+ category.CATEGORY_NAME + '</li>';
         }
         return formattedCategories;
+    }
+
+    function styleOrderSuccess () {
+        s.dynamicArea.innerHTML = '<h3>Order Successful!</h3><p>Thank you for your order. We\'ll do our best to get it to you as soon as possible.</p>' +
+        '<p>We\'ll contact you via email should there be any changes or queries regarding your order, so keep an eye on that inbox!</p>';
     }
 
     return {
