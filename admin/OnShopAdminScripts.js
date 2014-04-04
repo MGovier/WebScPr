@@ -111,16 +111,47 @@ onShop.admin = function () {
 
     function loaded () {
         getAllProductsAdmin();
-        var stockToggle = document.getElementById('stockLevels');
         var toggleStockTable = function () {
             getAllProductsAdmin();
         };
-        stockToggle.addEventListener('click', toggleStockTable);
-        var showAddFormButton = document.getElementById('productAddFormToggle');
-        showAddFormButton.addEventListener('click', showAddForm);
-        var showAddCategoryFormButton = document.getElementById('addCategoryToggle');
+        document.getElementById('stockLevels').addEventListener('click', toggleStockTable);
+        document.getElementById('productAddFormToggle').addEventListener('click', showAddForm);
         document.getElementById('manageCategories').addEventListener('click', manageCategories);
-        showAddCategoryFormButton.addEventListener('click', showAddCategoryForm);
+        document.getElementById('addCategoryToggle').addEventListener('click', showAddCategoryForm);
+        document.getElementById('viewOrders').addEventListener('click', manageOrders);
+    }
+
+    function manageOrders() {
+        var callback = function (r) {
+            document.getElementById('dynamic-content').innerHTML = styleOrders(r.target.responseText);
+        };
+        onShop.XHR.load({
+            'method': 'GET',
+            'url': '../api/1/order/',
+            'callbacks': {
+                'load': callback,
+                'error': onShop.functions.xhrError
+            }
+        });
+    }
+
+    function styleOrders (data) {
+        var orders = JSON.parse(data);
+        var rString = '<table class="productTable"><caption>Open Orders</caption><thead><tr><td>ID</td><td>Order Date</td><td>Name</td><td>Address</td><td>Email</td><td>Status</td>';
+        for (var i = orders.length - 1; i >= 0; i--) {
+            var status, order = orders[i];
+            // Could add further order status codes in the future!
+            if (order.ORDER_STATUS == 1) {status = 'Paid';}
+            rString += '<tr><td>' + order.ORDER_ID + '</td><td>' + order.ORDER_DATE + '</td><td>' + order.CUSTOMER_NAME + '</td><td>' + order.CUSTOMER_ADDRESS + '</td><td>' + order.CUSTOMER_EMAIL + '</td><td>' + status + '</td></tr>';
+            var pString = '<tr><td colspan="5"><pre>';
+            var products = JSON.parse(order.ORDER_PRODUCTS);
+            for (var j = products.length - 1; j >= 0; j--) {
+                var p = JSON.parse(products[j]);
+                pString += p[1] + '(ID:' + p[0] + ') x ' + p[3] + '\r\n';
+            }
+            rString += pString + '</pre></td><td><button id="' + order.ORDER_ID + '" class="order-done">Processed</button></td></tr>';
+        }
+        return rString + '</table>';
     }
 
     function showAddForm () {
@@ -158,15 +189,13 @@ onShop.admin = function () {
             document.getElementById('dynamic-content').innerHTML = r.target.responseText;
             document.getElementById('addProductForm').addEventListener('submit', sendListener);
         };
-        onShop.XHR.load(
-            {
-                'url': 'addProductForm.php',
-                'callbacks': {
-                    'load': callback,
-                    'error': onShop.functions.xhrError
-                }
+        onShop.XHR.load({
+            'url': 'addProductForm.php',
+            'callbacks': {
+                'load': callback,
+                'error': onShop.functions.xhrError
             }
-        );
+        });
     }
 
     function showAddCategoryForm () {
@@ -184,31 +213,27 @@ onShop.admin = function () {
             document.getElementById('dynamic-content').innerHTML = r.target.responseText;
             document.getElementById('addCategoryForm').addEventListener('submit', sendListener);
         };
-        onShop.XHR.load(
-            {
-                'url': 'addCategoryForm.php',
-                'callbacks': {
-                    'load': callback,
-                    'error': onShop.functions.xhrError
-                }
+        onShop.XHR.load({
+            'url': 'addCategoryForm.php',
+            'callbacks': {
+                'load': callback,
+                'error': onShop.functions.xhrError
             }
-        );
+        });
     }
 
     var sendForm = function (form, callback, progress) {
         var formData = new FormData(form);
-        onShop.XHR.load(
-            {
-                'method': 'POST',
-                'url': form.action,
-                'data': formData,
-                'callbacks': {
-                    'load': callback,
-                    'progress': progress,
-                    'error': onShop.functions.xhrError
-                }
+        onShop.XHR.load({
+            'method': 'POST',
+            'url': form.action,
+            'data': formData,
+            'callbacks': {
+                'load': callback,
+                'progress': progress,
+                'error': onShop.functions.xhrError
             }
-        );
+        });
     };
 
     function manageCategories () {
@@ -227,15 +252,13 @@ onShop.admin = function () {
                     deleteButtons[j].addEventListener('click', deleteCategory);
                 }
         };
-        onShop.XHR.load(
-            {
-                'url': '../api/1/categories/products',
-                'callbacks': {
-                    'load': callback,
-                    'error': onShop.functions.xhrError
-                }
+        onShop.XHR.load({
+            'url': '../api/1/categories/products',
+            'callbacks': {
+                'load': callback,
+                'error': onShop.functions.xhrError
             }
-        );
+        });
     }
 
     function deleteCategory (e) {

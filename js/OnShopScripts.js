@@ -455,7 +455,7 @@ onShop.functions = function () {
                 var productDetails = JSON.parse(r.target.responseText);
                 var quantityCost = productDetails.PRODUCT_PRICE * args.quantity;
                 basketProduct.push(args.pid, productDetails.PRODUCT_NAME, productDetails.PRODUCT_PRICE, args.quantity, quantityCost);
-                basketArray.push(basketProduct);
+                basketArray.push(JSON.stringify(basketProduct));
                 document.getElementById('basketTableBody').innerHTML += '<tr id="' + args.pid +'"><td><a href="product.php?id=' + args.pid + '">' + productDetails.PRODUCT_NAME + '</a></td><td class="thumbnail"><img src="' + productDetails.PRODUCT_IMAGE + '" alt="' + productDetails.PRODUCT_NAME + '">' + '<td>' + productDetails.PRODUCT_PRICE + '</td><td>'+ args.quantity + '</td><td>'+ quantityCost.toFixed(2) + '</td><td><button class="removeItem">Remove</button></td></tr>';
             }
         };

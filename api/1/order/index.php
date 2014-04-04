@@ -27,7 +27,14 @@
 		break;
 
 		case 'GET':
-
+			if (!isset($_REQUEST["id"])) {
+				$orders = $db->query("SELECT * FROM ORDERS WHERE ORDER_STATUS < 4");
+				$orderOutput = array();
+				while ($row = $orders->fetch_assoc()) {
+			    	$orderOutput[] = $row;
+				}
+				echo json_encode($orderOutput);
+			}
 		break;
 
 		default:
