@@ -124,10 +124,29 @@ onShop.admin = function () {
     function manageOrders() {
         var callback = function (r) {
             document.getElementById('dynamic-content').innerHTML = styleOrders(r.target.responseText);
+            var finishButtons = document.querySelectorAll('#ordersTable .order-done');
+            for (var i = 0; i < finishButtons.length; i++) {
+                finishButtons[i].addEventListener('click', markComplete);
+            }
         };
         onShop.XHR.load({
             'method': 'GET',
             'url': '../api/1/order/',
+            'callbacks': {
+                'load': callback,
+                'error': onShop.functions.xhrError
+            }
+        });
+    }
+
+    function markComplete (e) {
+        var callback = function (r) {
+            onShop.functions.showFeedback(r.target.response, 'notice');
+            manageOrders();
+        };
+        onShop.XHR.load({
+            'method': 'PATCH',
+            'url': '../api/1/order/' + e.target.id,
             'callbacks': {
                 'load': callback,
                 'error': onShop.functions.xhrError

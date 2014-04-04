@@ -54,10 +54,12 @@
 					$categoryID = intval($result["CATEGORY_ID"]);
 				} else {
 					echo 'Error! Category not found.';
+					header ("HTTP/1.1 400 Bad Request");
 					exit();
 				}
 			} else {
 				echo 'Error! Could not prepare statement.';
+				header ("HTTP/1.1 500 Internal Server Error");
 				exit();
 			}
 			if ($currentmaxIDquery = $db->query("SELECT MAX(PRODUCT_ID) FROM PRODUCTS")) {
@@ -76,10 +78,12 @@
 				$allowedExtensions = array("jpg", "jpeg", "png", "webp", "bmp", "gif", "svg");
 				if (!(in_array($fileExtension, $allowedExtensions))) {
 					echo ('Error: Unsupported File Type: ' . $fileExtension );
+					header ("HTTP/1.1 400 Bad Request");
 					exit();
 				}
 				if ($file['size'] > 8000000) {
 					echo 'Error: Files over 8MB would be a little inefficient!.';
+					header ("HTTP/1.1 400 Bad Request");
 					exit();
 				}
 				$productImage = "img/products/" . $productID . '.' . $fileExtension;
@@ -93,6 +97,7 @@
 				echo 'Product successfully inserted.';
 			} else {
 				echo 'Error! Database insertion problem.';
+				header ("HTTP/1.1 500 Internal Server Error");
 				exit();
 			}
 			break;
@@ -102,6 +107,7 @@
 			parse_str(file_get_contents('php://input'), $requestData); 
 			if (empty($requestData["id"])) {
 				echo 'Error! ID field is required.';
+				header ("HTTP/1.1 400 Bad Request");
 				exit();
 			}
 			$id = intval($requestData["id"]);
@@ -110,11 +116,13 @@
 				$currentStockQ = $db->stmt_init();
 				if ($currentStockQ->prepare("SELECT PRODUCT_STOCK, PRODUCT_PRICE FROM PRODUCTS WHERE PRODUCT_ID = ?")) {
 					$currentStockQ->bind_param("i", $id);
+					$currentStockQ->execute();
 					if ($resultRow = retrieve_single_row($currentStockQ)) {
 						$result = intval($resultRow["PRODUCT_STOCK"]);
 						$price = floatval($resultRow["PRODUCT_PRICE"]);
 					} else {
 						echo 'Error! Product not found.';
+						header ("HTTP/1.1 500 Internal Server Error");
 						exit();
 					}
 					// Block requests which would put us in negative stock.	
@@ -128,6 +136,7 @@
 					$stock = $result + $stockChange;
 				} else {
 					echo 'Error! Could not prepare statement.';
+					header ("HTTP/1.1 500 Internal Server Error");
 				}
 			// Otherwise they must be setting stock and price in an update!
 			} else {
@@ -141,12 +150,14 @@
 				echo 'Success! Items updated: ' . $query->affected_rows . '.';
 			} else {
 				echo 'Error! Could not prepare statement.';
+				header ("HTTP/1.1 500 Internal Server Error");
 			}
 			break;
 			
 		case 'DELETE':
 			if (empty($_REQUEST["id"])) {
 				echo 'Error! ID field is required.';
+				header ("HTTP/1.1 400 Bad Request");
 				exit();
 			}
 			$id = intval($_REQUEST["id"]);
@@ -158,10 +169,12 @@
 						$pictureName = $result["PRODUCT_IMAGE"];
 					} else {
 						echo 'Error! Product not found.';
+						header ("HTTP/1.1 500 Internal Server Error");
 						exit();
 					}
 			} else {
 				echo 'Error! Could not prepare statement.';
+				header ("HTTP/1.1 500 Internal Server Error");
 			}
 			$query = $db->stmt_init();
 			if ($query->prepare("DELETE FROM PRODUCTS WHERE PRODUCT_ID = ?")) {
@@ -170,6 +183,7 @@
 				echo 'Success! Items deleted: ' . $query->affected_rows . '.';
 			} else {
 				echo 'Error! Could not prepare statement.';
+				header ("HTTP/1.1 500 Internal Server Error");
 			}
 			// Better not delete the assets!
 			if (!(strpos($pictureName, "assets") || strpos($pictureName, "demo"))) {
@@ -179,6 +193,6 @@
 			break;
 
 		default:
-			header ("HTTP/1.1 400 Bad Request");
+			header ("HTTP/1.1 405 Method Not Allowed");
 			break;
 	}

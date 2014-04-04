@@ -37,8 +37,27 @@
 			}
 		break;
 
+		case 'PATCH':
+			if (empty($_REQUEST["id"])) {
+				echo 'Error! ID field is required.';
+				header("HTTP/1.1 400 Bad Request");
+				exit();
+			}
+			$id = intval($_REQUEST["id"]);
+			$query = $db->stmt_init();
+			if ($query->prepare("UPDATE `ORDERS` SET `ORDER_STATUS` = '4' WHERE `ORDERS`.`ORDER_ID` = ?;")) {
+				$query->bind_param("i", $id);
+				$query->execute();
+				echo 'Success! Orders updated: ' . $query->affected_rows . '.';
+			} else {
+				echo "Could not prepare statement.";
+				header ("HTTP/1.1 500 Internal Server Error");
+				exit();
+			}
+		break;
+
 		default:
-			header ("HTTP/1.1 400 Bad Request");
+			header ("HTTP/1.1 405 Method Not Allowed");
 			exit();
 		break;
 	}
