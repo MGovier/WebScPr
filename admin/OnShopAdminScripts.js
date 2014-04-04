@@ -137,7 +137,7 @@ onShop.admin = function () {
 
     function styleOrders (data) {
         var orders = JSON.parse(data);
-        var rString = '<table class="productTable"><caption>Open Orders</caption><thead><tr><td>ID</td><td>Order Date</td><td>Name</td><td>Address</td><td>Email</td><td>Status</td>';
+        var rString = '<table class="productTable" id="ordersTable"><caption>Open Orders</caption><thead><tr><th>ID</th><th>Order Date</th><th>Name</th><th>Address</th><th>Email</th><th>Status</th></tr></thead><tbody>';
         for (var i = orders.length - 1; i >= 0; i--) {
             var status, order = orders[i];
             // Could add further order status codes in the future!
@@ -151,7 +151,7 @@ onShop.admin = function () {
             }
             rString += pString + '</pre></td><td><button id="' + order.ORDER_ID + '" class="order-done">Processed</button></td></tr>';
         }
-        return rString + '</table>';
+        return rString + '</tbody></table>';
     }
 
     function showAddForm () {

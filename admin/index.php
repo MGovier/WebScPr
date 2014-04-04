@@ -3,10 +3,29 @@
 require_once("../inc/config.php");
 
 $pageTitle = "Admin";
-$section = "adminhome";
-include(ROOT_PATH . 'inc/header.php'); ?>
-<script src="<?php echo BASE_URL; ?>admin/onShopAdminScripts.js"></script>
+$section = "adminhome"; ?>
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8"/>	
+	<title><?php echo STORE_NAME . " > " . $pageTitle; ?></title>
+	<link rel="stylesheet" href="<?php echo BASE_URL; ?>css/style.css" type="text/css">
+	<!-- Icons -->
+	<link rel="apple-touch-icon" href="<?php echo BASE_URL; ?>img/assets/apple-icon-touch.png">
+	<link rel="icon" href="<?php echo BASE_URL; ?>img/assets/favicon.png">
+	<!-- Javascript -->
+    <script src="<?php echo BASE_URL; ?>js/onShopScripts.js"></script>
+    <script src="<?php echo BASE_URL; ?>js/onShopXHR.js"></script>
+	<script src="<?php echo BASE_URL; ?>admin/onShopAdminScripts.js"></script>
+</head>
+<body>
+<div class="header">
+	<div class="container">
+		<h1 class="branding-title"><a href="<?php echo BASE_URL; ?>"><?php echo STORE_NAME ?></a></h1>
+	</div>
+</div>
 
+<div id="content">
 <div class="container">
 <div id="feedback" class="vanish"></div>
 	<div id="side-options">

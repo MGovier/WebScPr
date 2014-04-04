@@ -340,6 +340,10 @@ body {
 	text-align: right;
 }
 
+#ordersTable tr:nth-child(n+2):nth-child(odd) {
+	border-top: 2px dashed Grey;
+}
+
 #basket ul {
 	display: block;
 	float: left;
