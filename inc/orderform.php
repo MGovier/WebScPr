@@ -259,8 +259,8 @@
 						</select>
 	    			</p>
 	    			<p>
-		    			<label for="email-address">Email address:</label>
-		    			<input name="remember-me" type="email" required />
+		    			<label for="customer-email">Email address:</label>
+		    			<input name="customer-email" type="email" required />
 	    			</p>
 	    			<p>
 		    			<label>Payment details:</label>

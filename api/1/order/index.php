@@ -10,14 +10,16 @@
 				|| empty($_POST["customer-email"]) 
 				|| empty($_POST["customer-order"])) {
 				echo 'Error! All fields are required.';
+				header ("HTTP/1.1 400 Bad Request");
 				exit();
 			}
 			$query = $db->stmt_init();
 			if ($query->prepare("INSERT INTO ORDERS VALUES (NULL, NOW(), ?, ?, ?, ?, 1)")) {
-				$query->bind_param("sss", $_POST["customer-name"], $_POST["customer-address"], , $_POST["customer-email"], $_POST["customer-order"]);
+				$query->bind_param("ssss", $_POST["customer-name"], $_POST["customer-address"], $_POST["customer-email"], $_POST["customer-order"]);
 				$query->execute();
 				echo "Order successful!";
 			} else {
+				header ("HTTP/1.1 400 Bad Request");
 				echo 'Error! Could not prepare statement.';
 				exit();
 			}
@@ -26,5 +28,10 @@
 
 		case 'GET':
 
+		break;
+
+		default:
+			header ("HTTP/1.1 400 Bad Request");
+			exit();
 		break;
 	}

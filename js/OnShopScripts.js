@@ -4,7 +4,7 @@ var onShop = onShop || {};
 onShop.functions = function () {
     'use strict';
 
-    var productsArray, s = {
+    var basketArray, productsArray, s = {
         settings: {
             dynamicArea: 'dynamic-content',
             shopName: document.title,
@@ -391,7 +391,7 @@ onShop.functions = function () {
 
     function submitOrder (form) {
         var formData = new FormData(form);
-        formData.append('customer-order', localStorage.BASKET);
+        formData.append('customer-order', JSON.stringify(basketArray));
         var callback = function (r) {
             showFeedback(r.target.responseText);
             localStorage.removeItem('BASKET');
@@ -446,12 +446,16 @@ onShop.functions = function () {
     }
 
     function styleBasketTable (basket) {
+        basketArray = [];
         var returnString = '<table class="productTable" id="basketTable"><caption>Summary</caption><thead><tr><th>Product Name</th><th>Product Thumbnail</th><th>Product Price</th><th>Product Quantity</th><th>Quantity Cost</th><th class="update">Update</th></tr></thead><tbody id="basketTableBody"></tbody></table>';
         var loadProduct = function (r, args) {
             if (r.target.status == 204) {document.getElementById('basketTableBody').innerHTML += '<tr id="' + args.pid +'"><td colspan="5">Sorry, item ' + args.pid + ' could not be found. It may have been removed.</td><td><button class="removeItem">Remove</button></td></tr>';}
             else {
+                var basketProduct = [];
                 var productDetails = JSON.parse(r.target.responseText);
                 var quantityCost = productDetails.PRODUCT_PRICE * args.quantity;
+                basketProduct.push(args.pid, productDetails.PRODUCT_NAME, productDetails.PRODUCT_PRICE, args.quantity, quantityCost);
+                basketArray.push(basketProduct);
                 document.getElementById('basketTableBody').innerHTML += '<tr id="' + args.pid +'"><td><a href="product.php?id=' + args.pid + '">' + productDetails.PRODUCT_NAME + '</a></td><td class="thumbnail"><img src="' + productDetails.PRODUCT_IMAGE + '" alt="' + productDetails.PRODUCT_NAME + '">' + '<td>' + productDetails.PRODUCT_PRICE + '</td><td>'+ args.quantity + '</td><td>'+ quantityCost.toFixed(2) + '</td><td><button class="removeItem">Remove</button></td></tr>';
             }
         };
