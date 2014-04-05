@@ -287,25 +287,6 @@ onShop.functions = function () {
             interval.unsetAll();
             // Push history for back/forward navigation and bookmarking.
             window.history.pushState(null, 'My Basket', 'basket.php');
-            var deleteItem = function (e) {
-                if (e.target.type == 'submit' && parseInt(e.target.parentNode.parentNode.id)) {
-                    var basket = JSON.parse(localStorage.BASKET);
-                    var newBasket = [];
-                    for (var i = basket.length - 1; i >= 0; i--) {
-                        var item = JSON.parse(basket[i]);
-                        // Check if they clicked something appropriate. 
-                        if (item.PRODUCT_ID != e.target.parentNode.parentNode.id) {
-                            newBasket.push(JSON.stringify(item));
-                        } else {
-                            changeStock(item, item.PRODUCT_QUANTITY, false);
-                        }
-                    }
-                    localStorage.BASKET = JSON.stringify(newBasket);
-                    showBasket();
-                    manageBasket();
-                    // It would be nice to send a "heartbeat" from the client basket to monitor activity.
-                }
-            };
             var basket = JSON.parse(localStorage.BASKET);
             s.dynamicArea.innerHTML = styleBasketTable(basket);
             s.featureTitle.innerHTML = 'My Basket';
@@ -313,17 +294,19 @@ onShop.functions = function () {
             var loadForm = function (r) {
                 s.dynamicArea.innerHTML += '<hr>' + r.target.responseText;
                 var table = document.getElementById('basketTable');
-                table.addEventListener('click', deleteItem);
-                if (basketArray.length < 1) {
-                    document.querySelector('#orderForm #submit').disabled = true;
-                }
+                table.addEventListener('click', deleteBasketItem);
+                // Check there are products in the basket.
+                checkForm();
                 var sendOrder = function (e) {
                     e.preventDefault();
                     if (e.target.checkValidity()) {
                         submitOrder(e.target);
                     }
                 };
-                document.getElementById('orderForm').addEventListener('submit', sendOrder);
+                var orderForm = document.getElementById('orderForm');
+                orderForm.addEventListener('submit', sendOrder);
+                // Paranoid check that the form is still correct.
+                orderForm.addEventListener('keyup', checkForm);
             };
             onShop.XHR.load(
                 {
@@ -337,6 +320,40 @@ onShop.functions = function () {
         } else {
             // They're not supposed to be here! Push them in the right direction...
             s.dynamicArea.innerHTML = '<a href="index.php"><button>Nothing here! Let\'s look at some products...</button>';
+        }
+    }
+
+    /** Check there are products in the basketArray and activate the submit button as necessary. */
+    function checkForm() {
+        var submitButton = document.querySelector('#orderForm #submit');
+        if (basketArray.length < 1) {
+            submitButton.disabled = true;
+        } else {
+            submitButton.disabled = false;
+        }
+    }
+
+    /** Remove an item from the basket and add the stock back through a changeStock call.
+
+        @param e Event fired from clicking anywhere on the basket table.
+    */
+    function deleteBasketItem (e) {
+        // Check what they clicked!
+        if (e.target.type == 'submit' && parseInt(e.target.parentNode.parentNode.id)) {
+            var basket = JSON.parse(localStorage.BASKET);
+            var newBasket = [];
+            for (var i = basket.length - 1; i >= 0; i--) {
+                var item = JSON.parse(basket[i]);
+                // Check if they clicked something appropriate. 
+                if (item.PRODUCT_ID != e.target.parentNode.parentNode.id) {
+                    newBasket.push(JSON.stringify(item));
+                } else {
+                    changeStock(item, item.PRODUCT_QUANTITY, false);
+                }
+            }
+            localStorage.BASKET = JSON.stringify(newBasket);
+            showBasket();
+            manageBasket();
         }
     }
 
