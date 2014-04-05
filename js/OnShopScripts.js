@@ -23,14 +23,13 @@ onShop.functions = function () {
         },
 
         // Now binding the elements to an internal setting object.
-        init: function() {
+        init: function () {
             this.settings.dynamicArea = document.getElementById(this.settings.dynamicArea);
             this.settings.sideMenu = document.getElementById(this.settings.sideMenu);
             this.settings.featureTitle = document.getElementById(this.settings.featureTitle);
             this.settings.basket = document.getElementById(this.settings.basket);
             s = this.settings;
         }
-
     };
 
     /** Object to keep track of window intervals.*/
@@ -215,6 +214,137 @@ onShop.functions = function () {
         }
     }
 
+    /** Filters the productArray for matching categories, hides non-matching. */
+    function filterProducts (categoryID, categoryName) {
+        // Try to display appropriate page titles and history events. 
+        window.history.pushState({cat:categoryID}, 'Category View', '');
+        var backFunction = function () {
+            window.removeEventListener('popstate', backFunction);
+        };
+        var unhideAll = function () {
+            for (var i = productsArray.length - 1; i >= 0; i--) {
+                var product = productsArray[i];
+                var productDOM = document.getElementById('product' + product.PRODUCT_ID);
+                productDOM.classList.remove('flipOut');
+            }
+        };
+        window.addEventListener('popstate', backFunction);
+            if (categoryID === '-1') {
+                unhideAll();
+                s.featureTitle.innerHTML = 'All Products';
+            } else {
+                for (var i = productsArray.length - 1; i >= 0; i--) {
+                    var product = productsArray[i];
+                    var productDOM = document.getElementById('product' + product.PRODUCT_ID);
+                    if (product.CATEGORY_ID == categoryID) {
+                        productDOM.classList.remove('flipOut');
+                    } else {
+                        productDOM.classList.add('flipOut');
+                    }
+                }
+                s.featureTitle.innerHTML = categoryName;
+            }
+    }
+
+    /** Load a specific product of that ID. */
+    function showProduct (productID) {
+        addBackButton();
+        showBasket();
+        // Update stock when customer adds product to basket.
+        var addToBasketListener = function (product) {
+            var quantity = document.getElementById('quantity').value;
+            changeStock(product, quantity, true);
+        };
+        var callback = function (r) {
+            // 200 means the product was found, anything else is a unmatching ID.
+            if (r.target.status == '200') {
+                var product = JSON.parse(r.target.responseText);
+                s.dynamicArea.innerHTML = styleProduct(product);
+                s.featureTitle.innerHTML = product.PRODUCT_NAME;
+                window.history.pushState(null, product.PRODUCT_NAME, 'product.php?id=' + product.PRODUCT_ID);
+                window.onpopstate = showProducts;
+                var addToBasketButton = document.getElementById('addToBasket');
+                addToBasketButton.addEventListener('click', function() {addToBasketListener(product);});
+                // Create an interval to check stock.
+                var checkStock = function () {
+                    refreshStock(productID);
+                };
+                interval.set(checkStock, 8000);
+            } else {s.dynamicArea.innerHTML = '<p>Sorry, that product couldn\'t be retrieved.</p>';}
+        };
+        onShop.XHR.load({
+            'url': 'api/1/product/' + productID,
+            'callbacks': {
+                'load': callback,
+                'error': xhrError
+            }
+        });
+    }
+
+    /** Update the stock count of the product. Updates the selection drop down to current availability. */
+    function refreshStock (productID) {
+        var updateStock = function (r) {
+            var stock = parseInt(r.target.responseText);
+            document.getElementById('stock').innerHTML = 'Stock: ' + stock;
+            var selector = document.getElementById('quantity');
+            if (stock === 0) {
+                selector.disabled = true;
+                document.getElementById('addToBasket').disabled = true;
+            }
+            if (selector.length > stock) {
+                for (var i = selector.length; i >= stock; i--) {
+                    selector.remove(i);
+                }
+            } else if (selector.length < stock) {
+                for (var j = selector.length + 1 ; j <= stock; j++) {
+                    var option = document.createElement('option');
+                    option.text = j;
+                    selector.add(option);
+                }
+                selector.disabled = false;
+                document.getElementById('addToBasket').disabled = false;
+            }
+        };
+        onShop.XHR.load({
+            'accept': 'text/html',
+            'url': 'api/1/product/' + productID + '/stock',
+            'callbacks': {
+                'load': updateStock,
+                'error': xhrError
+            }
+        });
+    }
+
+    /** Add the product to their JSON LocalStorage basket as a JSON object. */
+    function addToBasket (product, quantity) {
+        var newItem = {
+            PRODUCT_ID: product.PRODUCT_ID,
+            PRODUCT_PRICE: product.PRODUCT_PRICE,
+            PRODUCT_QUANTITY: quantity
+        };
+        if (localStorage.BASKET) {
+            var basket = JSON.parse(localStorage.BASKET);
+            var found = false;
+            // Check if the product is already in their basket and change the quantity if found.
+            for (var i = basket.length - 1; i >= 0; i--) {
+                var itemCheck = JSON.parse(basket[i]);
+                if (itemCheck.PRODUCT_ID === newItem.PRODUCT_ID) {
+                    found = true;
+                    itemCheck.PRODUCT_QUANTITY = parseInt(itemCheck.PRODUCT_QUANTITY) + parseInt(newItem.PRODUCT_QUANTITY);
+                    basket[i] = JSON.stringify(itemCheck);
+                }
+            }
+            if (!found) {basket.push(JSON.stringify(newItem));}
+            localStorage.BASKET = JSON.stringify(basket);
+        } else {
+            var newBasket = [];
+            newBasket.push(JSON.stringify(newItem));
+            localStorage.BASKET = JSON.stringify(newBasket);
+        }
+        showBasket();
+        showFeedback('Product added to basket!', 'notice');
+    }
+
     /** Show a basket underneath the product categories with number of products & cost. */
     function showBasket () {
         // Check the basket exists, or assume they haven't chosen anything.
@@ -355,136 +485,6 @@ onShop.functions = function () {
             showBasket();
             manageBasket();
         }
-    }
-
-    /** Filters the productArray for matching categories, hides non-matching. */
-    function filterProducts (categoryID, categoryName) {
-        // Try to display appropriate page titles and history events. 
-        window.history.pushState({cat:categoryID}, 'Category View', '');
-        var backFunction = function () {
-            window.removeEventListener('popstate', backFunction);
-        };
-        var unhideAll = function () {
-            for (var i = productsArray.length - 1; i >= 0; i--) {
-                var product = productsArray[i];
-                var productDOM = document.getElementById('product' + product.PRODUCT_ID);
-                productDOM.classList.remove('flipOut');
-            }
-        };
-        window.addEventListener('popstate', backFunction);
-            if (categoryID === '-1') {
-                unhideAll();
-                s.featureTitle.innerHTML = 'All Products';
-            } else {
-                for (var i = productsArray.length - 1; i >= 0; i--) {
-                    var product = productsArray[i];
-                    var productDOM = document.getElementById('product' + product.PRODUCT_ID);
-                    if (product.CATEGORY_ID == categoryID) {
-                        productDOM.classList.remove('flipOut');
-                    } else {
-                        productDOM.classList.add('flipOut');
-                    }
-                }
-                s.featureTitle.innerHTML = categoryName;
-            }
-    }
-
-    /** Load a specific product of that ID. */
-    function showProduct (productID) {
-        addBackButton();
-        showBasket();
-        // Update stock when customer adds product to basket.
-        var addToBasketListener = function (product) {
-            var quantity = document.getElementById('quantity').value;
-            changeStock(product, quantity, true);
-        };
-        var callback = function (r) {
-            // 200 means the product was found, anything else is a unmatching ID.
-            if (r.target.status == '200') {
-                var product = JSON.parse(r.target.responseText);
-                s.dynamicArea.innerHTML = styleProduct(product);
-                s.featureTitle.innerHTML = product.PRODUCT_NAME;
-                window.history.pushState(null, product.PRODUCT_NAME, 'product.php?id=' + product.PRODUCT_ID);
-                window.onpopstate = showProducts;
-                var addToBasketButton = document.getElementById('addToBasket');
-                addToBasketButton.addEventListener('click', function() {addToBasketListener(product);});
-                // Create an interval to check stock.
-                var checkStock = function () {
-                    refreshStock(productID);
-                };
-                interval.set(checkStock, 8000);
-            } else {s.dynamicArea.innerHTML = '<p>Sorry, that product couldn\'t be retrieved.</p>';}
-        };
-        onShop.XHR.load({
-            'url': 'api/1/product/' + productID,
-            'callbacks': {
-                'load': callback,
-                'error': xhrError
-            }
-        });
-    }
-
-    /** Update the stock count of the product. Updates the selection drop down to current availability. */
-    function refreshStock (productID) {
-        var updateStock = function (r) {
-            var stock = parseInt(r.target.responseText);
-            document.getElementById('stock').innerHTML = 'Stock: ' + stock;
-            var selector = document.getElementById('quantity');
-            if (stock === 0) {
-                selector.disabled = true;
-                document.getElementById('addToBasket').disabled = true;
-            }
-            if (selector.length > stock) {
-                for (var i = selector.length; i >= stock; i--) {
-                    selector.remove(i);
-                }
-            } else if (selector.length < stock) {
-                for (var j = selector.length + 1 ; j <= stock; j++) {
-                    var option = document.createElement('option');
-                    option.text = j;
-                    selector.add(option);
-                }
-                selector.disabled = false;
-                document.getElementById('addToBasket').disabled = false;
-            }
-        };
-        onShop.XHR.load({
-            'url': 'api/1/product/' + productID + '/stock',
-            'callbacks': {
-                'load': updateStock,
-                'error': xhrError
-            }
-        });
-    }
-
-    /** Add the product to their JSON LocalStorage basket as a JSON object. */
-    function addToBasket (product, quantity) {
-        var newItem = {
-            PRODUCT_ID: product.PRODUCT_ID,
-            PRODUCT_PRICE: product.PRODUCT_PRICE,
-            PRODUCT_QUANTITY: quantity
-        };
-        if (localStorage.BASKET) {
-            var basket = JSON.parse(localStorage.BASKET);
-            var found = false;
-            // Check if the product is already in their basket and change the quantity if found.
-            for (var i = basket.length - 1; i >= 0; i--) {
-                var itemCheck = JSON.parse(basket[i]);
-                if (itemCheck.PRODUCT_ID === newItem.PRODUCT_ID) {
-                    found = true;
-                    itemCheck.PRODUCT_QUANTITY = parseInt(itemCheck.PRODUCT_QUANTITY) + parseInt(newItem.PRODUCT_QUANTITY);
-                    basket[i] = JSON.stringify(itemCheck);
-                }
-            }
-            if (!found) {basket.push(JSON.stringify(newItem));}
-            localStorage.BASKET = JSON.stringify(basket);
-        } else {
-            var newBasket = [];
-            newBasket.push(JSON.stringify(newItem));
-            localStorage.BASKET = JSON.stringify(newBasket);
-        }
-        showBasket();
-        showFeedback('Product added to basket!', 'notice');
     }
 
     /** Submit the order to the API. If successful, resets the customer basket. */
