@@ -477,6 +477,7 @@ onShop.functions = function () {
         var callback = function (r) {
             if (r.target.status == '200') {
                 showFeedback(r.target.responseText, 'notice');
+                addSales(basketArray);
                 localStorage.removeItem('BASKET');
                 showBasket();
                 styleOrderSuccess();
@@ -491,6 +492,24 @@ onShop.functions = function () {
                 'error': xhrError
             }
         });
+    }
+
+    function addSales (basket) {
+        var saleMap = function (product) {
+            var p = JSON.parse(product);
+            onShop.XHR.load({
+                'data': {
+                    'id': p[0],
+                    'sales': p[3]
+                },
+                'method': 'PATCH',
+                'url': 'api/1/product/',
+                'callbacks': {
+                    'error': xhrError
+                }
+            });
+        };
+        basket.map(saleMap);
     }
 
     /******************************* 
@@ -550,7 +569,7 @@ onShop.functions = function () {
                 var basketProduct = [];
                 var productDetails = JSON.parse(r.target.responseText);
                 var quantityCost = productDetails.PRODUCT_PRICE * args.quantity;
-                basketProduct.push(args.pid, productDetails.PRODUCT_NAME, productDetails.PRODUCT_PRICE, args.quantity, quantityCost);
+                basketProduct.push(args.pid, productDetails.PRODUCT_NAME, productDetails.PRODUCT_PRICE, parseInt(args.quantity), quantityCost);
                 // basketArray is a hoisted variable with their current items in, used for sending the order. 
                 // This is a security issue as client can change details again. :-(.
                 basketArray.push(JSON.stringify(basketProduct));

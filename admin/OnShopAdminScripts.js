@@ -309,7 +309,7 @@ onShop.admin = function () {
 
     /** Formats the products table, sorts by lowest stock first. */
     function styleProductsAdmin(productsArray) {
-        var returnString = '<table class="productTable" id="stockTable"><caption>Products Sorted By Stock</caption><thead><tr><th>Product ID</th><th>Product Thumbnail</th><th>Product Name</th><th>Product Price</th><th>Product Stock</th><th>Product Sales (NYI)</th><th class="update">Update</th></tr></thead>';
+        var returnString = '<table class="productTable" id="stockTable"><caption>Products Sorted By Stock</caption><thead><tr><th>Product ID</th><th>Product Thumbnail</th><th>Product Name</th><th>Product Price</th><th>Product Stock</th><th>Product Sales</th><th class="update">Update</th></tr></thead>';
         for (var i = 0; i < productsArray.length; i++) {
             var product = productsArray[i];
             returnString += '<tr id="product' + product.PRODUCT_ID + '"><td>' + product.PRODUCT_ID + '</td>' +
@@ -317,7 +317,7 @@ onShop.admin = function () {
                 '<td>' + product.PRODUCT_NAME + '</td>' +
                 '<td class="price">' + product.PRODUCT_PRICE + '</td>' +
                 '<td class="stock">' + product.PRODUCT_STOCK + '</td>' +
-                '<td>' + 0 + '</td>' +
+                '<td>' + product.PRODUCT_SALES + '</td>' +
                 '<td class="optionButtons"><button class="editItem" id="' + product.PRODUCT_ID + '">Edit</button>' +
                 '<button class="deleteItem" id="' + product.PRODUCT_ID + '">Remove</button></td>';
         }

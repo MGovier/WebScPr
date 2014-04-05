@@ -137,8 +137,38 @@
 				exit();
 			}
 			$id = intval($requestData["id"]);
+			// Woohoo, a sale!
+			if (!(empty($requestData["sales"]))) {
+				$salesQ = $db->stmt_init();
+				if ($salesQ->prepare("SELECT PRODUCT_SALES FROM PRODUCTS WHERE PRODUCT_ID = ?")) {
+					$salesQ->bind_param("i", $id);
+					if ($resultRow = retrieve_single_row($salesQ)) {
+						$result = intval($resultRow["PRODUCT_SALES"]);
+					} else {
+						echo 'Product not found.';
+						header ("HTTP/1.1 500 Internal Server Error");
+						exit();
+					}
+				} else {
+					echo 'Error! Could not prepare statement.';
+					header ("HTTP/1.1 500 Internal Server Error");
+					exit();
+				}
+				$totalSales = $result + $requestData["sales"];
+				$query = $db->stmt_init();
+				if ($query->prepare("UPDATE PRODUCTS SET PRODUCT_SALES = ? WHERE PRODUCT_ID = ?")) {
+					$query->bind_param("ii", $totalSales, $id);
+					$query->execute();
+					echo 'Success! Items updated: ' . $query->affected_rows . '.';
+					exit();
+				} else {
+					echo 'Error! Could not prepare statement.';
+					header ("HTTP/1.1 500 Internal Server Error");
+					exit();
+				}
+			}
 			// If stockChange is provided they must want a stock change without specific values.
-			if (!(empty($requestData["stockChange"]))) {
+			else if (!(empty($requestData["stockChange"]))) {
 				$currentStockQ = $db->stmt_init();
 				if ($currentStockQ->prepare("SELECT PRODUCT_STOCK, PRODUCT_PRICE FROM PRODUCTS WHERE PRODUCT_ID = ?")) {
 					$currentStockQ->bind_param("i", $id);
@@ -151,8 +181,11 @@
 						exit();
 					}
 					// Block requests which would put us in negative stock.	
+					// First check if the stock is "taking away"
 					if ($requestData["stockChange"] < 0) {
+						// Now check if result minus the "taking away" puts us in negative
 						if (($result + $requestData["stockChange"]) < 0) {
+							// If it does, it should be blocked.
 							echo "Invalid stock operation";
 							header("HTTP/1.1 403 Forbidden");
 							exit();
@@ -177,6 +210,7 @@
 			} else {
 				echo 'Error! Could not prepare statement.';
 				header ("HTTP/1.1 500 Internal Server Error");
+				exit();
 			}
 			break;
 			
