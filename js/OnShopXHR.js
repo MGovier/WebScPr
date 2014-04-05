@@ -1,6 +1,6 @@
 /**
 	XHR function for AJAX requests throughout the project.
-	Heavily based on Kit Lester and Rich Boakes' Linora project (https://github.com/portsoc/linora).
+	Heavily based on Kit Lester and Rich Boakes' Linora project (https://github.com/portsoc/linora). Thanks!
 
 	@author UP663652
 */

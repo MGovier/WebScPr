@@ -1,4 +1,18 @@
 <?php 
+/*
+	API for Individual Products
+	Supports: 
+		GET - Retrieve the details of the product with the specified ID as a JSON object. 
+				If query=stock is provided, then only returns stock value as int.
+		POST - Create a new product with provided product name, category, stock and price.
+		PATCH - Update the stock and price of the item with the specified ID.
+		DELETE - Remove the item of that specific ID.
+
+	At the moment, this is hugely insecure as everyone has full API access.
+
+	@author UP663652
+*/
+
 	require_once("../../../inc/config.php");
 	require(ROOT_PATH . "inc/db/database.php");
 	require(ROOT_PATH . "inc/lib/lib.php");
@@ -12,6 +26,7 @@
 				header ("HTTP/1.1 400 Bad Request");
 				exit();
 			}
+			// If the query specifies stock, then only return the matching stock number.
 			if (isset($_GET["query"]) && $_GET["query"] == 'stock') {
 				$stockQ = $db->stmt_init();
 				if ($stockQ->prepare("SELECT PRODUCT_STOCK FROM PRODUCTS WHERE PRODUCT_ID=?")) {
@@ -21,6 +36,7 @@
 					} else header("HTTP/1.1 204 No Content");
 				} else header("HTTP/1.1 500 Internal Server Error");
 			} else {
+				// Otherwise send all fields.
 				$query = $db->stmt_init();
 				if ($query->prepare("SELECT * FROM PRODUCTS WHERE PRODUCT_ID=?")) {
 					$query->bind_param("i", $product_id);
@@ -34,11 +50,13 @@
 			break;
 
 		case 'POST':
+			// Check all necessary fields are provided.
 			if (empty($_POST["productName"]) 
 				|| empty($_POST["productCategory"]) 
 				|| empty($_POST["productStock"]) 
 				|| empty($_POST["productPrice"])) {
 				echo 'Error! All fields are required.';
+				header ("HTTP/1.1 400 Bad Request");
 				exit();
 			}
 			// Maybe a little paranoid about SQL injection...
@@ -48,6 +66,7 @@
 			$productStock = intval($db->real_escape_string($_POST["productStock"]));
 			$productPrice = floatval($db->real_escape_string($_POST["productPrice"]));
 			$catIDquery = $db->stmt_init();
+			// Find the matching category ID. Sending the name instead of ID acts as a check against incorrect categories.
 			if ($catIDquery->prepare("SELECT CATEGORY_ID FROM CATEGORIES WHERE CATEGORY_NAME LIKE ?")) {
 				$catIDquery->bind_param("s", $productCategory);
 				if ($result = retrieve_single_row($catIDquery)) {
@@ -62,16 +81,21 @@
 				header ("HTTP/1.1 500 Internal Server Error");
 				exit();
 			}
+			// Find the current highest product ID + 1. 
+			// We can't use MySQL's auto increment here, as we want to set the uploaded image URL to the new product ID.
 			if ($currentmaxIDquery = $db->query("SELECT MAX(PRODUCT_ID) FROM PRODUCTS")) {
 		            $row = $currentmaxIDquery->fetch_row();
 		            $productID = intval($row[0]) + 1;
 		    } else {
-		            echo 'Error! Problem with the database.';
+		            echo 'Database connection aborted.';
+		            header ("HTTP/1.1 500 Internal Server Error");
 		            exit();
 		    }
+		    // If they didn't provide an image, use a default... how about the favicon? Perfect.
 		    if (null == ($_FILES["productImage"]["tmp_name"])) {
 		    	$productImage = "img/assets/favicon.png";
 		    } else {
+		    	// If they did provide an image, check it is a suitable format and size, then rename it.
 				$file = $_FILES['productImage'];
 				$path = $file['name'];
 				$fileExtension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
@@ -82,11 +106,13 @@
 					exit();
 				}
 				if ($file['size'] > 8000000) {
-					echo 'Error: Files over 8MB would be a little inefficient!.';
+					// Should optimise their file instead...
+					echo 'Error: Files over 8Mb would be a little inefficient!.';
 					header ("HTTP/1.1 400 Bad Request");
 					exit();
 				}
 				$productImage = "img/products/" . $productID . '.' . $fileExtension;
+				// Move their file to the product images location.
 				move_uploaded_file($file["tmp_name"], ROOT_PATH . $productImage);
 			}
 			if ($query = $db->prepare("INSERT INTO `PRODUCTS` VALUES (?,?,?,?,?,?,?)")) {
@@ -106,28 +132,28 @@
 			// Get data from a PATCH request.
 			parse_str(file_get_contents('php://input'), $requestData); 
 			if (empty($requestData["id"])) {
-				echo 'Error! ID field is required.';
+				echo 'ID field is required.';
 				header ("HTTP/1.1 400 Bad Request");
 				exit();
 			}
 			$id = intval($requestData["id"]);
-			// They want to do a stock change without specific values.
+			// If stockChange is provided they must want a stock change without specific values.
 			if (!(empty($requestData["stockChange"]))) {
 				$currentStockQ = $db->stmt_init();
 				if ($currentStockQ->prepare("SELECT PRODUCT_STOCK, PRODUCT_PRICE FROM PRODUCTS WHERE PRODUCT_ID = ?")) {
 					$currentStockQ->bind_param("i", $id);
-					$currentStockQ->execute();
 					if ($resultRow = retrieve_single_row($currentStockQ)) {
 						$result = intval($resultRow["PRODUCT_STOCK"]);
 						$price = floatval($resultRow["PRODUCT_PRICE"]);
 					} else {
-						echo 'Error! Product not found.';
+						echo 'Product not found.';
 						header ("HTTP/1.1 500 Internal Server Error");
 						exit();
 					}
 					// Block requests which would put us in negative stock.	
 					if ($requestData["stockChange"] < 0) {
 						if (($result + $requestData["stockChange"]) < 0) {
+							echo "Invalid stock operation";
 							header("HTTP/1.1 403 Forbidden");
 							exit();
 						}
@@ -164,7 +190,6 @@
 			$picQ = $db->stmt_init();
 			if ($picQ->prepare("SELECT PRODUCT_IMAGE FROM PRODUCTS WHERE PRODUCT_ID = ?")) {
 				$picQ->bind_param("i", $id);
-				$picQ->execute();
 				if ($result = retrieve_single_row($picQ)) {
 						$pictureName = $result["PRODUCT_IMAGE"];
 					} else {
@@ -185,7 +210,7 @@
 				echo 'Error! Could not prepare statement.';
 				header ("HTTP/1.1 500 Internal Server Error");
 			}
-			// Better not delete the assets!
+			// Remove the associated image from the server (but make sure we're not removing the assets!)
 			if (!(strpos($pictureName, "assets") || strpos($pictureName, "demo"))) {
 				chdir(ROOT_PATH);
 				unlink($pictureName);
