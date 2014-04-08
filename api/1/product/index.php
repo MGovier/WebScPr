@@ -59,6 +59,7 @@
 				header ("HTTP/1.1 400 Bad Request");
 				exit();
 			}
+			// No need to use real_escape_string here, as we are using a prepared statement later which will escape our strings.
 			$productName = $_POST["productName"];
 			$productCategory = $_POST["productCategory"];
 			$productDescription = $_POST["productDescription"];
@@ -147,7 +148,7 @@
 						$result = intval($resultRow["PRODUCT_SALES"]);
 					} else {
 						echo 'Product not found.';
-						header ("HTTP/1.1 500 Internal Server Error");
+						header ("HTTP/1.1 204 No Content");
 						exit();
 					}
 				} else {
@@ -178,7 +179,7 @@
 						$price = floatval($resultRow["PRODUCT_PRICE"]);
 					} else {
 						echo 'Product not found.';
-						header ("HTTP/1.1 500 Internal Server Error");
+						header ("HTTP/1.1 204 No Content");
 						exit();
 					}
 					// Block requests which would put us in negative stock.	

@@ -5,7 +5,7 @@ require_once("../inc/config.php");
     			<fieldset>
     				<p>
 		    			<label for="categoryName">Category Name:</label>
-		    			<input type="text" id="categoryName" name="categoryName" placeholder="Enter category name" required>
+		    			<input type="text" id="categoryName" name="categoryName" placeholder="Enter category name" maxlength="20" required>
 	    			</p>
 	    			<p>
 	    				<label for="submitCat">Submit Category:</label>

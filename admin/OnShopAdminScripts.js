@@ -351,6 +351,10 @@ onShop.admin = function () {
     */
     function styleOrders(data, interactive) {
         var orders = JSON.parse(data);
+        // Tell them there are no orders if the array is empty.
+        if (orders.length === 0) {
+            onShop.functions.showFeedback('No orders to show!', 'notice');
+        }
         var rString = '<table class="productTable" id="ordersTable"><caption>Orders</caption><thead><tr><th>ID</th><th>Order Date</th><th>Name</th><th>Address</th><th>Email</th><th>Status</th></tr></thead><tbody>';
         for (var i = 0; i < orders.length; i++) {
             var status, order = orders[i];

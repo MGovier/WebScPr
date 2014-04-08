@@ -5,7 +5,7 @@ require_once("../inc/config.php");
     			<fieldset>
     				<p>
 		    			<label for="productName">Product Name:</label>
-		    			<input type="text" id="productName" name="productName" placeholder="Enter product name" required />
+		    			<input type="text" id="productName" name="productName" placeholder="Enter product name" maxlength="40" required />
 	    			</p>
 	    			<p>
 		    			<label for="productCategory">Product Category:</label>
