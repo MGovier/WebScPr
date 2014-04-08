@@ -50,9 +50,9 @@
 			<form id="step2" class="vanish" method="POST" action="inc/install/install.php">
 				<fieldset name="settings">
 					<label for="storeName">Store Name:</label>
-					<input type="text" id="storeName" name="storeName" required>
+					<input type="text" id="storeName" name="storeName" maxlength="30" required>
 					<label for="dbDemo">Install with demo items?</label>
-					<input type="checkbox" id="dbDemo" name="dbDemo">	
+					<input type="checkbox" id="dbDemo" name="dbDemo" checked>	
 				</fieldset>
 				<button id="step2submit" type="submit">Submit!</button>
 			</form>
