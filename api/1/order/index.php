@@ -57,8 +57,9 @@
 				$query->prepare("SELECT * FROM ORDERS WHERE ORDER_STATUS = ?");
 				$query->bind_param("i", $id);
 				$query->execute();
+				$result = $query->get_result();
 				$orderOutput = array();
-				while ($row = $query->fetch_assoc()) {
+				while ($row = $result->fetch_assoc()) {
 			    	$orderOutput[] = $row;
 				}
 				echo json_encode($orderOutput);

@@ -59,12 +59,11 @@
 				header ("HTTP/1.1 400 Bad Request");
 				exit();
 			}
-			// Maybe a little paranoid about SQL injection...
-			$productName = $db->real_escape_string($_POST["productName"]);
-			$productCategory = $db->real_escape_string($_POST["productCategory"]);
-			$productDescription = $db->real_escape_string($_POST["productDescription"]);
-			$productStock = intval($db->real_escape_string($_POST["productStock"]));
-			$productPrice = floatval($db->real_escape_string($_POST["productPrice"]));
+			$productName = $_POST["productName"];
+			$productCategory = $_POST["productCategory"];
+			$productDescription = $_POST["productDescription"];
+			$productStock = intval($_POST["productStock"]);
+			$productPrice = floatval($_POST["productPrice"]);
 			$catIDquery = $db->stmt_init();
 			// Find the matching category ID. Sending the name instead of ID acts as a check against incorrect categories.
 			if ($catIDquery->prepare("SELECT CATEGORY_ID FROM CATEGORIES WHERE CATEGORY_NAME LIKE ?")) {
@@ -115,14 +114,16 @@
 				// Move their file to the product images location.
 				move_uploaded_file($file["tmp_name"], ROOT_PATH . $productImage);
 			}
-			if ($query = $db->prepare("INSERT INTO `PRODUCTS` VALUES (?,?,?,?,?,?,?)")) {
-				// `PRODUCT_ID`, `PRODUCT_NAME`, `PRODUCT_DESCRIPTION`, `PRODUCT_IMAGE`, `PRODUCT_PRICE`, `PRODUCT_STOCK`, `CATEGORY_ID`
-				// int, string, string, string, double, int, int. Phew!
+			$query = $db->stmt_init();
+			if ($query = $db->prepare("INSERT INTO `PRODUCTS` VALUES (?,?,?,?,?,?,0,?)")) {
+				// `PRODUCT_ID`, `PRODUCT_NAME`, `PRODUCT_DESCRIPTION`, `PRODUCT_IMAGE`, `PRODUCT_PRICE`, `PRODUCT_STOCK`, `PRODUCT_SALES`, `CATEGORY_ID`
+				// int, string, string, string, double, int, int, int. Phew!
 				$query->bind_param("isssdii", $productID, $productName, $productDescription, $productImage, $productPrice, $productStock, $categoryID);
 				$query->execute();
 				echo 'Product successfully inserted.';
 			} else {
 				echo 'Error! Database insertion problem.';
+				echo ($productImage . $productDescription);
 				header ("HTTP/1.1 500 Internal Server Error");
 				exit();
 			}

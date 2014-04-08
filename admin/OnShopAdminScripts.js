@@ -26,6 +26,7 @@ onShop.admin = function () {
         document.getElementById('manageCategories').addEventListener('click', manageCategories);
         document.getElementById('addCategoryToggle').addEventListener('click', showAddCategoryForm);
         document.getElementById('viewOrders').addEventListener('click', manageOrders);
+        document.getElementById('viewCompleteOrders').addEventListener('click', viewOrderHistory);
     }
 
     /** Load a table of all the products. */
@@ -128,7 +129,7 @@ onShop.admin = function () {
     /** Displays a table of open orders, with a button to mark them as completed. */
     function manageOrders() {
         var callback = function (r) {
-            document.getElementById('dynamic-content').innerHTML = styleOrders(r.target.responseText);
+            document.getElementById('dynamic-content').innerHTML = styleOrders(r.target.responseText, true);
             // Attach event listeners to however many buttons there might be.
             var finishButtons = document.querySelectorAll('#ordersTable .order-done');
             for (var i = 0; i < finishButtons.length; i++) {
@@ -138,6 +139,26 @@ onShop.admin = function () {
         onShop.XHR.load({
             'method': 'GET',
             'url': '../api/1/order/',
+            'callbacks': {
+                'load': callback,
+                'error': onShop.functions.xhrError
+            }
+        });
+    }
+
+    /** Displays a table of finished orders. */
+    function viewOrderHistory() {
+        var callback = function (r) {
+            document.getElementById('dynamic-content').innerHTML = styleOrders(r.target.responseText, false);
+            // Attach event listeners to however many buttons there might be.
+            var finishButtons = document.querySelectorAll('#ordersTable .order-done');
+            for (var i = 0; i < finishButtons.length; i++) {
+                finishButtons[i].addEventListener('click', markComplete);
+            }
+        };
+        onShop.XHR.load({
+            'method': 'GET',
+            'url': '../api/1/order/4',
             'callbacks': {
                 'load': callback,
                 'error': onShop.functions.xhrError
@@ -324,16 +345,21 @@ onShop.admin = function () {
         return returnString + '</table>';
     }
 
-    /** Styles the (3 levels of nested JSON!) database data into a table.*/
-    function styleOrders(data) {
+    /** Styles the (3 levels of nested JSON!) database data into a table.
+
+        @param interactive Boolean to specify wether processing buttons should be placed in the styled table.
+    */
+    function styleOrders(data, interactive) {
         var orders = JSON.parse(data);
-        var rString = '<table class="productTable" id="ordersTable"><caption>Open Orders</caption><thead><tr><th>ID</th><th>Order Date</th><th>Name</th><th>Address</th><th>Email</th><th>Status</th></tr></thead><tbody>';
+        var rString = '<table class="productTable" id="ordersTable"><caption>Orders</caption><thead><tr><th>ID</th><th>Order Date</th><th>Name</th><th>Address</th><th>Email</th><th>Status</th></tr></thead><tbody>';
         for (var i = 0; i < orders.length; i++) {
             var status, order = orders[i];
             // Could add further order status codes in the future. Only 2 used here.
             // Paid = 1, Done = 4.
             if (order.ORDER_STATUS == 1) {
                 status = 'Paid';
+            } else if (order.ORDER_STATUS == 4) {
+                status = 'Complete';
             }
             rString += '<tr><td>' + order.ORDER_ID + '</td><td>' + order.ORDER_DATE + '</td><td>' + order.CUSTOMER_NAME + '</td><td>' + order.CUSTOMER_ADDRESS + '</td><td>' + order.CUSTOMER_EMAIL + '</td><td>' + status + '</td></tr>';
             var pString = '<tr><td colspan="5"><pre>';
@@ -342,7 +368,11 @@ onShop.admin = function () {
                 var p = JSON.parse(products[j]);
                 pString += p[1] + '(ID:' + p[0] + ') x ' + p[3] + '\r\n';
             }
-            rString += pString + '</pre></td><td><button id="' + order.ORDER_ID + '" class="order-done">Processed</button></td></tr>';
+            if (interactive) {
+                rString += pString + '</pre></td><td><button id="' + order.ORDER_ID + '" class="order-done">Processed</button></td></tr>';
+            } else {
+                rString += pString + '</pre></td><td>Processed</td></tr>';
+            }
         }
         return rString + '</tbody></table>';
     }

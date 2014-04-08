@@ -618,7 +618,7 @@ onShop.functions = function () {
         var formattedProduct = '<div id="product">' +
                            '<img src="' + product.PRODUCT_IMAGE + '" alt="' + product.PRODUCT_NAME + '">' +
                            '<div id="product-details">' +
-                           '<p id="description">' + product.PRODUCT_DESCRIPTION + '</p>' +
+                           '<p id="description">' + decodeURIComponent(product.PRODUCT_DESCRIPTION) + '</p>' +
                            '<p id="stock">Stock: ' + product.PRODUCT_STOCK + '</p>' +
                            '<p id="price">Price: ' + product.PRODUCT_PRICE + '</p>' +
                            styleAvailableStockSelector(product.PRODUCT_STOCK);

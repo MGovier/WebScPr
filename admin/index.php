@@ -34,8 +34,8 @@ $section = "adminhome"; ?>
 			<li id="productAddFormToggle">Add an Item</li>
 			<li id="manageCategories">Manage Categories</li>
 			<li id="addCategoryToggle">Add a Category</li>
-			<li id="viewOrders">View Orders</li>
-			<li id="viewStats">View Statistics</li>
+			<li id="viewOrders">View Open Orders</li>
+			<li id="viewCompleteOrders">View Completed Orders</li>
 		</ul>
 	</div>
 		<h3 id="feature-title">Admin Control</h3>
