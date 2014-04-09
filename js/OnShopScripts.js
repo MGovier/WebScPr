@@ -289,17 +289,24 @@ onShop.functions = function () {
             var selector = document.getElementById('quantity');
             if (stock === 0) {
                 selector.disabled = true;
+                selector.value = 0;
                 document.getElementById('addToBasket').disabled = true;
-            }
-            if (selector.length > stock) {
-                for (var i = selector.length; i >= stock; i--) {
-                    selector.remove(i);
-                }
-            } else if (selector.length < stock) {
-                for (var j = selector.length + 1 ; j <= stock; j++) {
-                    var option = document.createElement('option');
-                    option.text = j;
-                    selector.add(option);
+            } else {
+                if (selector.length > stock) {
+                    for (var i = selector.length; i >= stock; i--) {
+                        selector.remove(i);
+                    }
+                } else if (selector.length <= stock) {
+                    // Remove the 0 option.
+                    if (selector.length === 1) {
+                        selector.remove(0);
+                    }
+                    // Add in the new options.
+                    for (var j = selector.length + 1 ; j <= stock; j++) {
+                        var option = document.createElement('option');
+                        option.text = j;
+                        selector.add(option);
+                    }
                 }
                 selector.disabled = false;
                 document.getElementById('addToBasket').disabled = false;

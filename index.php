@@ -9,9 +9,10 @@ $pageTitle = "Home";
 $section = "home";
 include(ROOT_PATH . 'inc/header.php'); ?>
 
-<div class="container">
-	<div id="feedback" class="vanish"></div>
-	<div id="side-options">
+<section class="container">
+	<section id="feedback" class="vanish">
+	</section>
+	<section id="side-options">
 		<ul id="options">
 		</ul>
 		<ul id="basket">
@@ -20,10 +21,10 @@ include(ROOT_PATH . 'inc/header.php'); ?>
 				<p>Why not buy some stuff?!</p>
 			</li>
 		</ul>
-	</div>
+	</section>
 		<h3 id="feature-title">New Products</h3>
-		<div id="dynamic-content">
-    	</div>
-</div>
+		<section id="dynamic-content">
+    	</section>
+</section>
 
 <?php include(ROOT_PATH . 'inc/footer.php'); ?>
