@@ -267,10 +267,6 @@
 		    			An external service such as PayPal or any number of merchant services could be used here to manage transactions securely.
 	    			</p>
 	    			<p>
-		    			<label for="remember-me">Remember these details?</label>
-		    			<input name="remember-me" type="checkbox"/><em> Don't use this on public computers!</em>
-	    			</p>
-	    			<p>
 	    				<label for="submit">All done? </label>
 	    				<button type="submit" id="submit" name="submit" value="Submit!">Submit Order</button>
     				</p>
