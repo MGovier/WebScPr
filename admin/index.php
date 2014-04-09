@@ -19,16 +19,16 @@ $section = "adminhome"; ?>
 	<script src="<?php echo BASE_URL; ?>admin/onShopAdminScripts.js"></script>
 </head>
 <body>
-<div class="header">
+<section class="header">
 	<div class="container">
 		<h1 class="branding-title"><a href="<?php echo BASE_URL; ?>"><?php echo STORE_NAME ?></a></h1>
 	</div>
-</div>
+</section>
 
-<div id="content">
-<div class="container">
-<div id="feedback" class="vanish"></div>
-	<div id="side-options">
+<section id="content">
+<section class="container">
+	<section id="feedback" class="vanish"></section>
+	<section id="side-options">
 		<ul id="options">
 			<li id="stockLevels">Manage Items</li>
 			<li id="productAddFormToggle">Add an Item</li>
@@ -37,12 +37,11 @@ $section = "adminhome"; ?>
 			<li id="viewOrders">View Open Orders</li>
 			<li id="viewCompleteOrders">View Completed Orders</li>
 		</ul>
-	</div>
+	</section>
 		<h3 id="feature-title">Admin Control</h3>
-
-		<div id="dynamic-content">
-    	</div>
+	<section id="dynamic-content">
+    </section>
     		
-</div>
+</section>
 
 <?php include(ROOT_PATH . 'inc/footer.php'); ?>

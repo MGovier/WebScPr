@@ -13,14 +13,14 @@
 
 </head>
 <body>
-<div class="header">
+<section class="header">
 	<div class="container">
 		<h1 class="branding-title"><a href="<?php echo BASE_URL; ?>"><?php echo STORE_NAME ?></a></h1>
 		<form class="searchbar">
 			<input type="search" name="search" id="search" placeholder="Search Products">
 		</form>	
 	</div>
-</div>
+</section>
 
-<div id="content">
+<section id="content">
 
