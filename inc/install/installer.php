@@ -63,7 +63,7 @@
 		<div class="container">
 			<p>&copy; <?php echo date('Y');?>  - UP663652 - <a href="http://lesterk.myweb.port.ac.uk/webscrp/2013~14/">WEBSCRP at UoP</a></p>
 			<ul>
-				<li><a href="../help/">Help</a></li>
+				<li><a href="../docs/">Help</a></li>
 			</ul>
 		</div>	
 	</div>

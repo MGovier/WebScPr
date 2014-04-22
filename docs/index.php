@@ -30,7 +30,7 @@ $section = "adminhome"; ?>
 		<p class="file"><a href="pdf/OnShopInstallationGuide.pdf">Installation Guide PDF</a></p>
 		<p class="file"><a href="pdf/OnShopUserGuide.pdf">User Guide PDF</a></p>
 		<hr>
-		<p class="file"><a href="pdf/OnShopFinalSpec.pdf">Final Specification</a></p>
+		<p class="file"><a href="pdf/OnShopFinalSpec.pdf">Final Specification PDF</a></p>
 		<hr>
 		<p class="file"><a href="pdf/OnShopInterimOne.pdf">Interim One PDF</a></p>
 		<p class="file"><a href="pdf/OnShopInterimTwo.pdf">Interim Two PDF</a></p>
