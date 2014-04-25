@@ -547,7 +547,7 @@ onShop.functions = function () {
     */
     function showFeedback (feedback, level) {
         var target = document.getElementById('feedback');
-        target.innerHTML = '<p><span id="closeFeedback"> X </span>' + feedback + '</p>';
+        target.innerHTML = '<p><span id="closeFeedback"> (Close) </span>' + feedback + '</p>';
         target.classList.remove('vanish');
         var hideFeedback = function () {
             target.classList.add('vanish');
